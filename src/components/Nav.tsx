@@ -2,7 +2,7 @@ const links = [
   { href: "#overview", label: "Overview" },
   { href: "#scotland", label: "Scotland" },
   { href: "#amsterdam", label: "Amsterdam" },
-  { href: "#details", label: "Trip Details" },
+  { href: "#trip-details", label: "Trip Details" },
 ];
 
 export function Nav() {

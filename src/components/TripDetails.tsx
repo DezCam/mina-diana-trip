@@ -8,7 +8,7 @@ export function TripDetails({ details }: { details: DetailGroup[] }) {
   return (
     <section className="mx-auto max-w-6xl px-5 py-14 sm:px-8 lg:px-10" aria-labelledby="details-title">
       <SectionHeading
-        id="details"
+        id="trip-details"
         eyebrow="Trip Details"
         title="Useful notes for the road"
         description="This area is ready for confirmed travel logistics, emergency references, weather links, transport notes, and packing reminders."
