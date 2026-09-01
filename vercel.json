@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/desmonds-amsterdam-recommendations",
+      "destination": "/index.html"
+    }
+  ]
+}
