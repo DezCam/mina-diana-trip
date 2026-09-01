@@ -5,6 +5,7 @@ import { scotlandConsiderations } from "./data/scotland";
 
 const recommendationsPath = "/desmonds-amsterdam-recommendations";
 const amsterdamPhoto = "/images/amsterdam/amsterdam-canal.jpg";
+const scotlandPhoto = "/images/scotland/edinburgh.jpg";
 const headerMark = "/images/branding/castle-windmill.png";
 const siteTitle = "Diana & Mina's European Adventure";
 const hotelMapsUrl = "https://maps.app.goo.gl/XGjTeYouGkLRFCEk7";
@@ -27,7 +28,7 @@ function TripGuide() {
         <Hero />
         <Overview />
         <DestinationSection id="amsterdam" title="Amsterdam" tone="amsterdam" showImage />
-        <DestinationSection id="scotland" title="Scotland" tone="scotland" />
+        <DestinationSection id="scotland" title="Scotland" tone="scotland" showImage />
         <TripDetails />
       </main>
       <footer className="border-t border-brass/35 px-6 py-8 text-center font-serif text-lg">
@@ -155,10 +156,10 @@ function DestinationSection({ id, title, tone, showImage = false }: { id: string
           {isAmsterdam ? <AmsterdamHomeBase /> : null}
           {showImage ? (
             <img
-              src={amsterdamPhoto}
-              alt="Amsterdam canal with bicycles on a bridge."
+              src={isScotland ? scotlandPhoto : amsterdamPhoto}
+              alt={isScotland ? "View of Edinburgh, Scotland." : "Amsterdam canal with bicycles on a bridge."}
               loading="lazy"
-              className={`${isAmsterdam ? "mt-8" : ""} aspect-[16/9] w-full rounded-md object-cover object-[50%_48%]`}
+              className={`${isAmsterdam ? "mt-8" : ""} aspect-[16/9] w-full rounded-md object-cover ${isScotland ? "object-[55%_45%]" : "object-[50%_48%]"}`}
             />
           ) : (
             <Thistle className="h-32 w-28 opacity-55" />
