@@ -20,35 +20,42 @@ export function RecommendationsList({ recommendations }: RecommendationsListProp
 }
 
 function RecommendationCard({ recommendation }: { recommendation: Recommendation }) {
-  const meta = [recommendation.category, recommendation.neighborhood].filter(Boolean).join(" · ");
+  const [featuredImage, ...supportingImages] = recommendation.images ?? [];
 
   return (
     <article className="overflow-hidden rounded-lg border border-brass/25 bg-cream shadow-soft">
-      {recommendation.image ? (
-        <div className="aspect-[4/3] w-full overflow-hidden bg-canal/10 sm:aspect-[16/9]">
-          <img
-            src={recommendation.image}
-            alt={recommendation.imageAlt ?? ""}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
+      {featuredImage ? (
+        <div className="grid gap-3 p-3 sm:grid-cols-[1.35fr_0.65fr] sm:p-4">
+          <div className="aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[4/3]">
+            <img
+              src={featuredImage.src}
+              alt={featuredImage.alt}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          {supportingImages.length > 0 ? (
+            <div className="flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-rows-2 sm:overflow-visible sm:pb-0">
+              {supportingImages.map((image) => (
+                <div key={image.src} className="aspect-[4/3] min-w-[78%] snap-start overflow-hidden rounded-md bg-canal/10 sm:min-w-0">
+                  <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
       <div className="p-5 sm:p-7">
         <h2 className="font-serif text-3xl leading-tight text-highland sm:text-4xl">{recommendation.name}</h2>
-        {meta ? <p className="mt-2 text-sm font-bold uppercase tracking-[0.14em] text-canal">{meta}</p> : null}
-        {recommendation.description ? (
-          <p className="mt-5 text-base leading-7 text-ink/78">{recommendation.description}</p>
+        {recommendation.category ? (
+          <p className="mt-2 text-sm font-bold uppercase tracking-[0.14em] text-canal">{recommendation.category}</p>
         ) : null}
-        {recommendation.personalNote ? (
-          <p className="mt-4 border-l-2 border-brass pl-4 text-sm leading-6 text-ink/72">
-            {recommendation.personalNote}
-          </p>
+        {recommendation.shortRecommendation ? (
+          <p className="mt-5 font-serif text-2xl leading-8 text-ink">{recommendation.shortRecommendation}</p>
         ) : null}
-        {recommendation.address ? <p className="mt-5 text-sm font-semibold text-highland">{recommendation.address}</p> : null}
         <div className="mt-5 flex flex-wrap gap-3">
-          {recommendation.mapUrl ? (
-            <a className="action-button" href={recommendation.mapUrl} target="_blank" rel="noreferrer">
+          {recommendation.mapsUrl ? (
+            <a className="action-button min-h-12 px-4" href={recommendation.mapsUrl} target="_blank" rel="noreferrer">
               <MapPin aria-hidden="true" size={16} />
               Open in Maps
             </a>
