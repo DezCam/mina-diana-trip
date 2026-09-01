@@ -1,9 +1,11 @@
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin } from "lucide-react";
 import { RecommendationsList } from "./components/Recommendations";
 import { recommendations } from "./data/recommendations";
 
 const recommendationsPath = "/desmonds-amsterdam-recommendations";
 const amsterdamPhoto = "/images/amsterdam/amsterdam-canal.jpg";
+const siteTitle = "Diana & Mina's European Adventure";
+const hotelMapsUrl = "https://maps.app.goo.gl/XGjTeYouGkLRFCEk7";
 
 export default function App() {
   if (window.location.pathname === recommendationsPath) {
@@ -11,7 +13,7 @@ export default function App() {
     return <RecommendationsPage />;
   }
 
-  document.title = "Mina & Diana's European Adventure";
+  document.title = siteTitle;
   return <TripGuide />;
 }
 
@@ -27,7 +29,7 @@ function TripGuide() {
         <TripDetails />
       </main>
       <footer className="border-t border-brass/35 px-6 py-8 text-center font-serif text-lg">
-        Mina & Diana's European Adventure
+        {siteTitle}
       </footer>
     </div>
   );
@@ -40,7 +42,7 @@ function SiteHeader() {
         <a href="/" className="group flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip">
           <Thistle className="h-16 w-12 shrink-0 sm:h-20 sm:w-16" />
           <span>
-            <span className="block font-serif text-3xl leading-none text-highland sm:text-4xl">Mina & Diana's</span>
+            <span className="block font-serif text-3xl leading-none text-highland sm:text-4xl">Diana & Mina's</span>
             <span className="mt-2 block text-[0.72rem] font-semibold uppercase tracking-[0.42em] text-brass sm:text-sm">
               European Adventure
             </span>
@@ -72,7 +74,7 @@ function Hero() {
         <div className="relative z-20 flex items-center bg-cream/90 px-6 py-16 sm:px-12 lg:px-20">
           <div className="max-w-3xl">
             <h1 className="font-serif text-[clamp(3.4rem,8vw,7rem)] leading-[0.98] tracking-normal text-highland">
-              Mina & Diana's
+              Diana & Mina's
               <span className="block">European Adventure</span>
             </h1>
             <p className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-base font-bold uppercase tracking-[0.42em] sm:text-xl">
@@ -132,6 +134,8 @@ function DestinationPanel({ title, tone }: { title: string; tone: "scotland" | "
 }
 
 function DestinationSection({ id, title, tone, showImage = false }: { id: string; title: string; tone: "scotland" | "amsterdam"; showImage?: boolean }) {
+  const isAmsterdam = id === "amsterdam";
+
   return (
     <section id={id} className="scroll-mt-32 px-6 py-20 sm:px-10 lg:px-20">
       <div className="mx-auto max-w-7xl">
@@ -140,12 +144,13 @@ function DestinationSection({ id, title, tone, showImage = false }: { id: string
           <span className="h-px flex-1 bg-brass/55" aria-hidden="true" />
         </div>
         <div className={`rounded-lg border border-brass/25 ${tone === "scotland" ? "bg-moss/10" : "bg-canal/10"} p-8 sm:p-10`}>
+          {isAmsterdam ? <AmsterdamHomeBase /> : null}
           {showImage ? (
             <img
               src={amsterdamPhoto}
               alt="Amsterdam canal with bicycles on a bridge."
               loading="lazy"
-              className="aspect-[16/9] w-full rounded-md object-cover object-[50%_48%]"
+              className={`${isAmsterdam ? "mt-8" : ""} aspect-[16/9] w-full rounded-md object-cover object-[50%_48%]`}
             />
           ) : (
             <Thistle className="h-32 w-28 opacity-55" />
@@ -154,6 +159,30 @@ function DestinationSection({ id, title, tone, showImage = false }: { id: string
         </div>
       </div>
     </section>
+  );
+}
+
+function AmsterdamHomeBase() {
+  return (
+    <div className="rounded-lg border border-brass/25 bg-cream p-6 shadow-soft sm:p-8">
+      <p className="text-sm font-bold uppercase tracking-[0.18em] text-canal">Amsterdam Home Base</p>
+      <div className="mt-4 grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
+        <div>
+          <h3 className="font-serif text-3xl leading-tight text-highland sm:text-4xl">
+            Hotel Espresso City Centre
+          </h3>
+          <address className="mt-4 not-italic leading-7 text-ink">
+            Overtoom 57
+            <br />
+            1054 HC Amsterdam
+          </address>
+        </div>
+        <a className="action-button min-h-12 px-4" href={hotelMapsUrl} target="_blank" rel="noreferrer">
+          <MapPin aria-hidden="true" size={16} />
+          Open in Maps
+        </a>
+      </div>
+    </div>
   );
 }
 
