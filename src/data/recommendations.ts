@@ -12,6 +12,10 @@ export type Recommendation = {
   mapsUrl?: string;
   reservationUrl?: string | null;
   proximityNote?: string;
+  continueTo?: {
+    id: string;
+    label: string;
+  };
   websiteUrl?: string;
 };
 
@@ -60,6 +64,31 @@ export const recommendations: Recommendation[] = [
     proximityNote: "Near where you're staying.",
     mapsUrl:
       "https://www.google.com/maps/place/Blushing/@52.3588108,4.8777835,17z/data=!3m1!4b1!4m6!3m5!1s0x47c609ef84312b37:0x3b945b98b15e15c7!8m2!3d52.3588108!4d4.8803584!16s%2Fg%2F11bw5x9_yx?entry=tts&g_ep=EgoyMDI2MDgyNi4wIPu8ASoASAFQAw%3D%3D&skid=4c4b1f09-deea-43f0-ac49-22ca0e355279",
+    images: [],
+  },
+  {
+    id: "weteringsplantsoen",
+    name: "Weteringsplantsoen",
+    group: "things-to-do",
+    category: "Park / Walk",
+    shortRecommendation:
+      "An incredible park that you have to see. It's an easy walk and close by.",
+    personalNote:
+      "I recommend walking through here on your way to the Bloemenmarkt.",
+    continueTo: {
+      id: "bloemenmarkt",
+      label: "Continue to Bloemenmarkt",
+    },
+    mapsUrl: "https://maps.app.goo.gl/bMNoKkDEnjBvWJQ77",
+    images: [],
+  },
+  {
+    id: "bloemenmarkt",
+    name: "Bloemenmarkt",
+    group: "things-to-do",
+    category: "Flower Market",
+    personalNote: "Pair this with the walk through Weteringsplantsoen.",
+    mapsUrl: "https://maps.app.goo.gl/KrUW66brx1A87XJ5A",
     images: [],
   },
   {

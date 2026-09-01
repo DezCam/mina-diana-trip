@@ -1,4 +1,4 @@
-import { ExternalLink, MapPin } from "lucide-react";
+import { ArrowRight, ExternalLink, MapPin } from "lucide-react";
 import { recommendationGroups, type Recommendation } from "../data/recommendations";
 
 type RecommendationsListProps = {
@@ -29,7 +29,18 @@ export function RecommendationsList({ recommendations }: RecommendationsListProp
             </div>
             <div className="grid gap-7">
               {groupRecommendations.map((recommendation) => (
-                <RecommendationCard key={recommendation.id} recommendation={recommendation} />
+                <div key={recommendation.id}>
+                  <RecommendationCard recommendation={recommendation} />
+                  {recommendation.continueTo ? (
+                    <a
+                      className="mx-auto mt-4 inline-flex min-h-11 items-center gap-2 rounded-md border border-brass/30 bg-parchment px-4 text-xs font-bold uppercase tracking-[0.14em] text-canal transition hover:bg-canal/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip"
+                      href={`#${recommendation.continueTo.id}`}
+                    >
+                      {recommendation.continueTo.label}
+                      <ArrowRight aria-hidden="true" size={15} />
+                    </a>
+                  ) : null}
+                </div>
               ))}
             </div>
           </section>
@@ -43,7 +54,7 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
   const [featuredImage, ...supportingImages] = recommendation.images ?? [];
 
   return (
-    <article className="overflow-hidden rounded-lg border border-brass/25 bg-cream shadow-soft">
+    <article id={recommendation.id} className="scroll-mt-28 overflow-hidden rounded-lg border border-brass/25 bg-cream shadow-soft">
       {featuredImage ? (
         <div className={supportingImages.length > 0 ? "grid gap-3 p-3 sm:grid-cols-[1.35fr_0.65fr] sm:p-4" : "p-3 sm:p-4"}>
           <div className={supportingImages.length > 0 ? "aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[4/3]" : "aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[16/9]"}>
