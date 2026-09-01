@@ -25,8 +25,8 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
   return (
     <article className="overflow-hidden rounded-lg border border-brass/25 bg-cream shadow-soft">
       {featuredImage ? (
-        <div className="grid gap-3 p-3 sm:grid-cols-[1.35fr_0.65fr] sm:p-4">
-          <div className="aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[4/3]">
+        <div className={supportingImages.length > 0 ? "grid gap-3 p-3 sm:grid-cols-[1.35fr_0.65fr] sm:p-4" : "p-3 sm:p-4"}>
+          <div className={supportingImages.length > 0 ? "aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[4/3]" : "aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[16/9]"}>
             <img
               src={featuredImage.src}
               alt={featuredImage.alt}
@@ -64,6 +64,17 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
             <a className="action-button" href={recommendation.websiteUrl} target="_blank" rel="noreferrer">
               <ExternalLink aria-hidden="true" size={16} />
               Website
+            </a>
+          ) : null}
+          {recommendation.reservationUrl === null ? (
+            <span className="action-button action-button-disabled min-h-12 px-4" aria-disabled="true">
+              Reservation Link Coming Soon
+            </span>
+          ) : null}
+          {recommendation.reservationUrl ? (
+            <a className="action-button min-h-12 px-4" href={recommendation.reservationUrl} target="_blank" rel="noreferrer">
+              <ExternalLink aria-hidden="true" size={16} />
+              Reservation
             </a>
           ) : null}
         </div>

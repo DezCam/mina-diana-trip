@@ -8,6 +8,7 @@ export type Recommendation = {
     alt: string;
   }[];
   mapsUrl?: string;
+  reservationUrl?: string | null;
   websiteUrl?: string;
 };
 
@@ -31,6 +32,20 @@ export const recommendations: Recommendation[] = [
       {
         src: "/images/recommendations/eggs-benaddicted-prinsengracht/desmond-and-friends.jpeg",
         alt: "Desmond and friends dining at Eggs Benaddicted Prinsengracht",
+      },
+    ],
+  },
+  {
+    id: "flagship-amsterdam",
+    name: "Flagship Amsterdam",
+    category: "Boat Tour",
+    shortRecommendation:
+      "The Boat tour company, Flagship Amsterdam, was incredible — the tour is a must. It was a great way to explore the city, Drinks were included and I recommend doing this early on in the trip.",
+    reservationUrl: null,
+    images: [
+      {
+        src: "/images/recommendations/flagship-amsterdam/flagship-amsterdam-boat-tour.jpeg",
+        alt: "Flagship Amsterdam boat docked along the canal",
       },
     ],
   },

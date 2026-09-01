@@ -134,6 +134,18 @@ body {
   outline-offset: 3px;
 }
 
+.action-button-disabled {
+  color: rgba(23, 50, 77, 0.62);
+  background: rgba(246, 240, 229, 0.62);
+  border-color: rgba(198, 161, 91, 0.32);
+  cursor: not-allowed;
+}
+
+.action-button-disabled:hover {
+  background: rgba(246, 240, 229, 0.62);
+  border-color: rgba(198, 161, 91, 0.32);
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     scroll-behavior: auto;
