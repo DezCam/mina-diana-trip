@@ -3,6 +3,10 @@
     {
       "source": "/desmonds-amsterdam-recommendations",
       "destination": "/index.html"
+    },
+    {
+      "source": "/emergency",
+      "destination": "/index.html"
     }
   ]
 }
