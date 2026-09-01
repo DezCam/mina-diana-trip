@@ -4,7 +4,8 @@ import { recommendations } from "./data/recommendations";
 import { scotlandConsiderations } from "./data/scotland";
 
 const recommendationsPath = "/desmonds-amsterdam-recommendations";
-const amsterdamPhoto = "/images/amsterdam/amsterdam-canal.jpg";
+const amsterdamHeroPhoto = "/images/amsterdam/amsterdam-canal.jpg";
+const amsterdamSectionPhoto = "/images/amsterdam/amsterdam-section.jpg";
 const scotlandPhoto = "/images/scotland/edinburgh.jpg";
 const headerMark = "/images/branding/castle-windmill.png";
 const siteTitle = "Diana & Mina's European Adventure";
@@ -98,7 +99,7 @@ function Hero() {
         </div>
         <div className="hero-photo relative min-h-[20rem] lg:min-h-[42rem]">
           <img
-            src={amsterdamPhoto}
+            src={amsterdamHeroPhoto}
             alt="Amsterdam canal with bicycles on a bridge."
             className="h-full w-full object-cover object-[58%_50%] lg:object-[55%_50%]"
           />
@@ -156,8 +157,8 @@ function DestinationSection({ id, title, tone, showImage = false }: { id: string
           {isAmsterdam ? <AmsterdamHomeBase /> : null}
           {showImage ? (
             <img
-              src={isScotland ? scotlandPhoto : amsterdamPhoto}
-              alt={isScotland ? "View of Edinburgh, Scotland." : "Amsterdam canal with bicycles on a bridge."}
+              src={isScotland ? scotlandPhoto : amsterdamSectionPhoto}
+              alt={isScotland ? "View of Edinburgh, Scotland." : "View of Amsterdam"}
               loading="lazy"
               className={`${isAmsterdam ? "mt-8" : ""} aspect-[16/9] w-full rounded-md object-cover ${isScotland ? "object-[55%_45%]" : "object-[50%_48%]"}`}
             />
