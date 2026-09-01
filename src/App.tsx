@@ -22,9 +22,8 @@ function TripGuide() {
       <main>
         <Hero />
         <Overview />
-        <DestinationSection id="scotland" title="Scotland" tone="scotland" />
         <DestinationSection id="amsterdam" title="Amsterdam" tone="amsterdam" showImage />
-        <RecommendationsEntry />
+        <DestinationSection id="scotland" title="Scotland" tone="scotland" />
         <TripDetails />
       </main>
       <footer className="border-t border-brass/35 px-6 py-8 text-center font-serif text-lg">
@@ -50,8 +49,8 @@ function SiteHeader() {
 
         <nav aria-label="Main navigation" className="grid grid-cols-4 items-center gap-2 pb-1 lg:flex lg:gap-8">
           <a className="nav-link" href="#overview">Overview</a>
-          <a className="nav-link" href="#scotland">Scotland</a>
           <a className="nav-link" href="#amsterdam">Amsterdam</a>
+          <a className="nav-link" href="#scotland">Scotland</a>
           <a className="nav-link" href="#trip-details">Trip Details</a>
           <a className="recommendations-link col-span-4 justify-center lg:col-span-1 lg:justify-start" href={recommendationsPath}>
             Desmond's Amsterdam Recommendations
@@ -77,9 +76,9 @@ function Hero() {
               <span className="block">European Adventure</span>
             </h1>
             <p className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-base font-bold uppercase tracking-[0.42em] sm:text-xl">
-              <span className="text-moss">Scotland</span>
-              <span className="text-brass">×</span>
               <span className="text-tulip">Amsterdam</span>
+              <span className="text-brass">×</span>
+              <span className="text-moss">Scotland</span>
             </p>
             <DecorativeRule />
             <p className="mt-8 font-serif text-xl italic leading-8 text-ink sm:text-2xl">
@@ -112,8 +111,8 @@ function Overview() {
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
-          <DestinationPanel title="Scotland" tone="scotland" />
           <DestinationPanel title="Amsterdam" tone="amsterdam" />
+          <DestinationPanel title="Scotland" tone="scotland" />
         </div>
       </div>
     </section>
