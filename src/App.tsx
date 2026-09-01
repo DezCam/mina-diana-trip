@@ -4,6 +4,7 @@ import { recommendations } from "./data/recommendations";
 
 const recommendationsPath = "/desmonds-amsterdam-recommendations";
 const amsterdamPhoto = "/images/amsterdam/amsterdam-canal.jpg";
+const headerMark = "/images/branding/castle-windmill.png";
 const siteTitle = "Diana & Mina's European Adventure";
 const hotelMapsUrl = "https://maps.app.goo.gl/XGjTeYouGkLRFCEk7";
 
@@ -40,7 +41,12 @@ function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-brass/70 bg-cream/94 backdrop-blur-md">
       <div className="mx-auto flex max-w-[90rem] flex-col gap-4 px-5 py-4 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12">
         <a href="/" className="group flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip">
-          <Thistle className="h-16 w-12 shrink-0 sm:h-20 sm:w-16" />
+          <img
+            src={headerMark}
+            alt=""
+            className="h-14 w-24 shrink-0 object-contain sm:h-20 sm:w-36"
+            aria-hidden="true"
+          />
           <span>
             <span className="block font-serif text-3xl leading-none text-highland sm:text-4xl">Diana & Mina's</span>
             <span className="mt-2 block text-[0.72rem] font-semibold uppercase tracking-[0.42em] text-brass sm:text-sm">
