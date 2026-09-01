@@ -1,9 +1,11 @@
-import { ArrowLeft, ArrowRight, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin, PhoneCall } from "lucide-react";
 import { RecommendationsList } from "./components/Recommendations";
+import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "./data/emergency";
 import { recommendations } from "./data/recommendations";
 import { scotlandConsiderations } from "./data/scotland";
 
 const recommendationsPath = "/desmonds-amsterdam-recommendations";
+const emergencyPath = "/emergency";
 const amsterdamHeroPhoto = "/images/amsterdam/amsterdam-canal.jpg";
 const amsterdamSectionPhoto = "/images/amsterdam/amsterdam-section.jpg";
 const scotlandPhoto = "/images/scotland/edinburgh.jpg";
@@ -15,6 +17,11 @@ export default function App() {
   if (window.location.pathname === recommendationsPath) {
     document.title = "Desmond's Amsterdam Recommendations";
     return <RecommendationsPage />;
+  }
+
+  if (window.location.pathname === emergencyPath) {
+    document.title = "In Case of Emergency";
+    return <EmergencyPage />;
   }
 
   document.title = siteTitle;
@@ -58,11 +65,12 @@ function SiteHeader() {
           </span>
         </a>
 
-        <nav aria-label="Main navigation" className="grid grid-cols-4 items-center gap-2 pb-1 lg:flex lg:gap-8">
-          <a className="nav-link" href="#overview">Overview</a>
-          <a className="nav-link" href="#amsterdam">Amsterdam</a>
-          <a className="nav-link" href="#scotland">Scotland</a>
-          <a className="nav-link" href="#trip-details">Trip Details</a>
+        <nav aria-label="Main navigation" className="grid grid-cols-4 items-center gap-2 pb-1 lg:flex lg:gap-7">
+          <a className="nav-link" href="/#overview">Overview</a>
+          <a className="nav-link" href="/#amsterdam">Amsterdam</a>
+          <a className="nav-link" href="/#scotland">Scotland</a>
+          <a className="nav-link" href="/#trip-details">Trip Details</a>
+          <a className="nav-link" href={emergencyPath}>Emergency</a>
           <a className="recommendations-link col-span-4 justify-center lg:col-span-1 lg:justify-start" href={recommendationsPath}>
             Desmond's Amsterdam Recommendations
           </a>
@@ -272,10 +280,16 @@ function RecommendationsPage() {
     <div className="min-h-screen bg-parchment text-highland">
       <main className="px-6 py-7 sm:px-10 lg:px-20">
         <div className="mx-auto max-w-6xl">
-          <a className="inline-flex min-h-12 items-center gap-2 rounded-md border border-brass/35 bg-cream px-5 text-sm font-bold uppercase tracking-[0.14em] text-highland shadow-soft transition hover:bg-parchment focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip" href="/">
-            <ArrowLeft aria-hidden="true" size={17} />
-            Back to Trip Guide
-          </a>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <a className="inline-flex min-h-12 items-center gap-2 rounded-md border border-brass/35 bg-cream px-5 text-sm font-bold uppercase tracking-[0.14em] text-highland shadow-soft transition hover:bg-parchment focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip" href="/">
+              <ArrowLeft aria-hidden="true" size={17} />
+              Back to Trip Guide
+            </a>
+            <a className="action-button min-h-12 px-4" href={emergencyPath}>
+              <PhoneCall aria-hidden="true" size={16} />
+              Emergency
+            </a>
+          </div>
           <header className="relative py-16 sm:py-24">
             <CanalHouses className="mb-8 h-24 w-36 text-canal opacity-65" />
             <h1 className="max-w-4xl font-serif text-5xl leading-tight sm:text-7xl">
@@ -286,6 +300,182 @@ function RecommendationsPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+function EmergencyPage() {
+  return (
+    <div className="min-h-screen bg-parchment text-highland">
+      <SiteHeader />
+      <main className="px-5 py-6 sm:px-10 lg:px-20">
+        <div className="mx-auto max-w-6xl">
+          <a className="inline-flex min-h-12 items-center gap-2 rounded-md border border-brass/35 bg-cream px-5 text-sm font-bold uppercase tracking-[0.14em] text-highland shadow-soft transition hover:bg-parchment focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip" href="/">
+            <ArrowLeft aria-hidden="true" size={17} />
+            Back to Trip Guide
+          </a>
+
+          <header className="py-8 sm:py-10">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-tulip">
+              Emergency
+            </p>
+            <h1 className="mt-3 font-serif text-5xl leading-tight text-highland sm:text-7xl">
+              In Case of Emergency
+            </h1>
+          </header>
+
+          <section className="rounded-lg border border-brass/35 bg-cream p-5 shadow-soft sm:p-7">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-tulip">
+              Emergency
+            </p>
+            <div className="mt-3 grid gap-1 font-serif text-2xl leading-tight text-highland sm:text-3xl">
+              <p>Call 112 in Amsterdam</p>
+              <p>Call 999 or 112 in Edinburgh</p>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <EmergencyNumberCard city="Amsterdam" number="112" href="tel:112" />
+              <EmergencyNumberCard city="Edinburgh" number="999" href="tel:999" secondaryNumber="112" secondaryHref="tel:112" />
+            </div>
+          </section>
+
+          <QuickCallGuide />
+
+          <div className="mt-10 grid gap-8 lg:grid-cols-2">
+            {emergencyCities.map((city) => (
+              <section key={city.name} aria-labelledby={`${city.name.toLowerCase()}-emergency`}>
+                <div className="mb-5 flex items-center gap-4">
+                  <h2 id={`${city.name.toLowerCase()}-emergency`} className="font-serif text-4xl text-highland sm:text-5xl">
+                    {city.name}
+                  </h2>
+                  <span className="h-px flex-1 bg-brass/55" aria-hidden="true" />
+                </div>
+                <div className="grid gap-4">
+                  {city.contacts.map((contact) => (
+                    <EmergencyContactCard key={contact.title} contact={contact} />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+
+          <section className="mt-10 rounded-lg border border-brass/30 bg-cream p-5 shadow-soft sm:p-7">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-canal">
+              {stateDepartmentFallback.title}
+            </p>
+            <p className="mt-3 max-w-3xl leading-7 text-ink">
+              {stateDepartmentFallback.description}
+            </p>
+            <p className="mt-5 text-sm font-bold uppercase tracking-[0.14em] text-moss">
+              {stateDepartmentFallback.label}
+            </p>
+            <a className="mt-3 inline-flex min-h-14 items-center justify-center gap-2 rounded-md border border-brass/45 bg-parchment px-5 text-base font-extrabold uppercase tracking-[0.12em] text-highland transition hover:bg-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip" href={stateDepartmentFallback.href}>
+              <PhoneCall aria-hidden="true" size={18} />
+              {stateDepartmentFallback.number}
+            </a>
+          </section>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function EmergencyNumberCard({ city, number, href, secondaryNumber, secondaryHref }: { city: string; number: string; href: string; secondaryNumber?: string; secondaryHref?: string }) {
+  return (
+    <article className="rounded-md border border-brass/25 bg-parchment p-5">
+      <h2 className="font-serif text-3xl leading-tight text-highland">{city}</h2>
+      <a className="mt-4 flex min-h-16 items-center justify-center gap-3 rounded-md border border-tulip/30 bg-highland px-5 text-lg font-extrabold uppercase tracking-[0.12em] text-cream shadow-soft transition hover:bg-canal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip" href={href}>
+        <PhoneCall aria-hidden="true" size={22} />
+        Call {number}
+      </a>
+      {secondaryNumber && secondaryHref ? (
+        <a className="mt-3 flex min-h-12 items-center justify-center gap-2 rounded-md border border-brass/45 bg-cream px-4 text-sm font-extrabold uppercase tracking-[0.12em] text-highland transition hover:bg-parchment focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip" href={secondaryHref}>
+          <PhoneCall aria-hidden="true" size={16} />
+          Or call {secondaryNumber}
+        </a>
+      ) : null}
+    </article>
+  );
+}
+
+function QuickCallGuide() {
+  return (
+    <section className="mt-8 rounded-lg border border-brass/25 bg-canal/10 p-5 sm:p-7" aria-labelledby="quick-call-guide">
+      <h2 id="quick-call-guide" className="font-serif text-3xl leading-tight text-highland">
+        What Do I Call?
+      </h2>
+      <div className="mt-5 grid gap-3">
+        {quickCallGuide.map((item) => (
+          <article key={item.need} className="rounded-md border border-brass/20 bg-cream/90 p-4">
+            <h3 className="font-bold leading-6 text-ink">{item.need}</h3>
+            <div className="mt-3 grid gap-2 text-sm font-bold uppercase tracking-[0.1em] sm:grid-cols-2">
+              {item.amsterdam ? <p>Amsterdam → {item.amsterdam}</p> : null}
+              <p>Edinburgh → {item.edinburgh}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function EmergencyContactCard({ contact }: { contact: (typeof emergencyCities)[number]["contacts"][number] }) {
+  const primaryAction = contact.actions.find((action) => action.emphasis === "primary");
+  const secondaryActions = contact.actions.filter((action) => action !== primaryAction);
+
+  return (
+    <article className="rounded-lg border border-brass/25 bg-cream p-5 shadow-soft sm:p-6">
+      <p className="text-sm font-bold uppercase tracking-[0.16em] text-canal">
+        {contact.title}
+      </p>
+      {contact.number ? (
+        <p className="mt-3 font-serif text-5xl leading-none text-highland">
+          {contact.number}
+        </p>
+      ) : null}
+      {contact.label ? (
+        <h3 className="mt-3 font-serif text-2xl leading-tight text-highland">
+          {contact.label}
+        </h3>
+      ) : null}
+      {contact.address ? (
+        <address className="mt-3 not-italic leading-7 text-ink">
+          {contact.address.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+        </address>
+      ) : null}
+      {contact.description ? (
+        <p className="mt-3 leading-7 text-ink">
+          {contact.description}
+        </p>
+      ) : null}
+      <div className="mt-5 grid gap-3">
+        {primaryAction ? <CallAction action={primaryAction} /> : null}
+        {secondaryActions.map((action) => (
+          <CallAction key={action.href} action={action} />
+        ))}
+      </div>
+      {contact.warning ? (
+        <p className="mt-5 border-l-2 border-tulip/55 pl-3 text-sm font-extrabold uppercase tracking-[0.1em] text-highland">
+          {contact.warning}
+        </p>
+      ) : null}
+    </article>
+  );
+}
+
+function CallAction({ action }: { action: (typeof emergencyCities)[number]["contacts"][number]["actions"][number] }) {
+  const isPrimary = action.emphasis === "primary";
+
+  return (
+    <a
+      className={`${isPrimary ? "min-h-16 bg-highland text-cream hover:bg-canal" : "min-h-12 bg-parchment text-highland hover:bg-cream"} inline-flex items-center justify-center gap-2 rounded-md border border-brass/45 px-5 py-3 text-center text-sm font-extrabold uppercase leading-5 tracking-[0.1em] shadow-soft transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip sm:text-base`}
+      href={action.href}
+    >
+      <PhoneCall aria-hidden="true" size={isPrimary ? 21 : 17} />
+      {action.label}
+    </a>
   );
 }
 
