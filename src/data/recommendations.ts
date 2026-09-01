@@ -61,4 +61,12 @@ export const recommendations: Recommendation[] = [
       "https://www.google.com/maps/place/Blushing/@52.3588108,4.8777835,17z/data=!3m1!4b1!4m6!3m5!1s0x47c609ef84312b37:0x3b945b98b15e15c7!8m2!3d52.3588108!4d4.8803584!16s%2Fg%2F11bw5x9_yx?entry=tts&g_ep=EgoyMDI2MDgyNi4wIPu8ASoASAFQAw%3D%3D&skid=4c4b1f09-deea-43f0-ac49-22ca0e355279",
     images: [],
   },
+  {
+    id: "rijksmuseum",
+    name: "Rijksmuseum",
+    category: "Museum",
+    shortRecommendation: "A must-see, with good food and sweet treats.",
+    mapsUrl: "https://maps.app.goo.gl/fZf4nKisMuGax5WG7",
+    images: [],
+  },
 ];
