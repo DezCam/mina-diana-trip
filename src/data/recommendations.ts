@@ -9,6 +9,7 @@ export type Recommendation = {
   }[];
   mapsUrl?: string;
   reservationUrl?: string | null;
+  proximityNote?: string;
   websiteUrl?: string;
 };
 
@@ -18,6 +19,7 @@ export const recommendations: Recommendation[] = [
     name: "Eggs Benaddicted Prinsengracht",
     category: "Restaurant",
     shortRecommendation: "My favorite restaurant in Amsterdam.",
+    proximityNote: "Near where you're staying.",
     mapsUrl:
       "https://www.google.com/maps/place/Eggs+Benaddicted+Prinsengracht/@52.364388,4.8843264,19z/data=!4m6!3m5!1s0x47c609c9b0259f8b:0xfa8c0f7d53d9f5b4!8m2!3d52.364388!4d4.8849487!16s%2Fg%2F11mvkb6b16?entry=tts&g_ep=EgoyMDI2MDgyNi4wIPu8ASoASAFQAw%3D%3D&skid=7f00d923-7d40-4c48-bccb-59a060c9ea65",
     images: [
@@ -48,5 +50,15 @@ export const recommendations: Recommendation[] = [
         alt: "Flagship Amsterdam boat docked along the canal",
       },
     ],
+  },
+  {
+    id: "blushing",
+    name: "Blushing",
+    category: "Restaurant",
+    shortRecommendation: "Also really good, and close to where you're staying.",
+    proximityNote: "Near where you're staying.",
+    mapsUrl:
+      "https://www.google.com/maps/place/Blushing/@52.3588108,4.8777835,17z/data=!3m1!4b1!4m6!3m5!1s0x47c609ef84312b37:0x3b945b98b15e15c7!8m2!3d52.3588108!4d4.8803584!16s%2Fg%2F11bw5x9_yx?entry=tts&g_ep=EgoyMDI2MDgyNi4wIPu8ASoASAFQAw%3D%3D&skid=4c4b1f09-deea-43f0-ac49-22ca0e355279",
+    images: [],
   },
 ];

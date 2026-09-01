@@ -146,6 +146,19 @@ body {
   border-color: rgba(198, 161, 91, 0.32);
 }
 
+.proximity-note {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  border-left: 2px solid rgba(61, 127, 152, 0.5);
+  padding: 0 0.9rem;
+  color: rgba(23, 50, 77, 0.72);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     scroll-behavior: auto;

@@ -54,6 +54,9 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
           <p className="mt-5 font-serif text-2xl leading-8 text-ink">{recommendation.shortRecommendation}</p>
         ) : null}
         <div className="mt-5 flex flex-wrap gap-3">
+          {recommendation.proximityNote ? (
+            <span className="proximity-note">{recommendation.proximityNote}</span>
+          ) : null}
           {recommendation.mapsUrl ? (
             <a className="action-button min-h-12 px-4" href={recommendation.mapsUrl} target="_blank" rel="noreferrer">
               <MapPin aria-hidden="true" size={16} />
