@@ -1,5 +1,5 @@
 import { ExternalLink, MapPin } from "lucide-react";
-import type { Recommendation } from "../data/recommendations";
+import { recommendationGroups, type Recommendation } from "../data/recommendations";
 
 type RecommendationsListProps = {
   recommendations: Recommendation[];
@@ -11,10 +11,30 @@ export function RecommendationsList({ recommendations }: RecommendationsListProp
   }
 
   return (
-    <div className="grid gap-7">
-      {recommendations.map((recommendation) => (
-        <RecommendationCard key={recommendation.id} recommendation={recommendation} />
-      ))}
+    <div className="grid gap-14">
+      {recommendationGroups.map((group) => {
+        const groupRecommendations = recommendations.filter((recommendation) => recommendation.group === group.id);
+
+        if (groupRecommendations.length === 0) {
+          return null;
+        }
+
+        return (
+          <section key={group.id} aria-labelledby={`${group.id}-heading`}>
+            <div className="mb-6 flex items-center gap-5">
+              <h2 id={`${group.id}-heading`} className="font-serif text-4xl leading-tight text-highland sm:text-5xl">
+                {group.label}
+              </h2>
+              <span className="h-px flex-1 bg-brass/55" aria-hidden="true" />
+            </div>
+            <div className="grid gap-7">
+              {groupRecommendations.map((recommendation) => (
+                <RecommendationCard key={recommendation.id} recommendation={recommendation} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }
@@ -52,6 +72,11 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
         ) : null}
         {recommendation.shortRecommendation ? (
           <p className="mt-5 font-serif text-2xl leading-8 text-ink">{recommendation.shortRecommendation}</p>
+        ) : null}
+        {recommendation.personalNote ? (
+          <p className="mt-4 border-l border-brass/55 pl-4 text-base leading-7 text-ink/80 sm:text-lg">
+            {recommendation.personalNote}
+          </p>
         ) : null}
         <div className="mt-5 flex flex-wrap gap-3">
           {recommendation.proximityNote ? (
