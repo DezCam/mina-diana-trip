@@ -7,14 +7,7 @@ type RecommendationsListProps = {
 
 export function RecommendationsList({ recommendations }: RecommendationsListProps) {
   if (recommendations.length === 0) {
-    return (
-      <div className="rounded-lg border border-canal/18 bg-cream/82 p-6 text-center shadow-soft sm:p-8">
-        <p className="font-serif text-2xl text-highland">Recommendations coming soon.</p>
-        <p className="mt-4 text-xs font-bold uppercase tracking-[0.16em] text-heather">
-          Placeholder content
-        </p>
-      </div>
-    );
+    return <p className="rounded-lg border border-brass/25 bg-cream p-8 font-serif text-3xl text-highland shadow-soft">Coming Soon</p>;
   }
 
   return (
@@ -30,7 +23,7 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
   const meta = [recommendation.category, recommendation.neighborhood].filter(Boolean).join(" · ");
 
   return (
-    <article className="overflow-hidden rounded-lg border border-highland/10 bg-cream shadow-soft">
+    <article className="overflow-hidden rounded-lg border border-brass/25 bg-cream shadow-soft">
       {recommendation.image ? (
         <div className="aspect-[4/3] w-full overflow-hidden bg-canal/10 sm:aspect-[16/9]">
           <img
@@ -42,7 +35,7 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
         </div>
       ) : null}
       <div className="p-5 sm:p-7">
-        <h2 className="font-serif text-3xl leading-tight text-highland">{recommendation.name}</h2>
+        <h2 className="font-serif text-3xl leading-tight text-highland sm:text-4xl">{recommendation.name}</h2>
         {meta ? <p className="mt-2 text-sm font-bold uppercase tracking-[0.14em] text-canal">{meta}</p> : null}
         {recommendation.description ? (
           <p className="mt-5 text-base leading-7 text-ink/78">{recommendation.description}</p>

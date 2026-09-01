@@ -16,7 +16,7 @@ export default {
         cream: "#FFF9EF",
       },
       fontFamily: {
-        serif: ["Libre Baskerville", "Georgia", "serif"],
+        serif: ["Cormorant Garamond", "Georgia", "serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
       },
       boxShadow: {
