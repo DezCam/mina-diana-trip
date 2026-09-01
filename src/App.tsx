@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, MapPin, PhoneCall } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, MapPin, PhoneCall } from "lucide-react";
 import { RecommendationsList } from "./components/Recommendations";
 import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "./data/emergency";
 import { recommendations } from "./data/recommendations";
@@ -6,6 +6,26 @@ import { scotlandConsiderations } from "./data/scotland";
 
 const recommendationsPath = "/desmonds-amsterdam-recommendations";
 const emergencyPath = "/emergency";
+const downloads = [
+  {
+    title: "Trip Guide",
+    label: "Download PDF",
+    href: "/downloads/trip-guide.pdf",
+    fileName: "Diana-Mina-European-Adventure-Trip-Guide.pdf",
+  },
+  {
+    title: "Amsterdam Recommendations",
+    label: "Download PDF",
+    href: "/downloads/dezrecs.pdf",
+    fileName: "Diana-Mina-Amsterdam-Recommendations.pdf",
+  },
+  {
+    title: "Emergency Contacts",
+    label: "Download PDF",
+    href: "/downloads/emergency.pdf",
+    fileName: "Diana-Mina-Emergency-Contacts.pdf",
+  },
+];
 const amsterdamHeroPhoto = "/images/amsterdam/amsterdam-canal.jpg";
 const amsterdamSectionPhoto = "/images/amsterdam/amsterdam-section.jpg";
 const scotlandPhoto = "/images/scotland/edinburgh.jpg";
@@ -35,6 +55,7 @@ function TripGuide() {
       <main>
         <Hero />
         <Overview />
+        <OfflineDownloads />
         <DestinationSection id="amsterdam" title="Amsterdam" tone="amsterdam" showImage />
         <DestinationSection id="scotland" title="Scotland" tone="scotland" showImage />
         <TripDetails />
@@ -43,6 +64,62 @@ function TripGuide() {
         {siteTitle}
       </footer>
     </div>
+  );
+}
+
+function OfflineDownloads() {
+  return (
+    <section id="offline-downloads" className="bg-parchment px-6 py-14 sm:px-10 lg:px-20">
+      <div className="mx-auto max-w-7xl rounded-lg border border-brass/25 bg-cream p-6 shadow-soft sm:p-8">
+        <div className="grid gap-6 lg:grid-cols-[0.65fr_1.35fr] lg:items-start">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-canal">
+              Offline Downloads
+            </p>
+            <h2 className="mt-3 font-serif text-4xl leading-tight text-highland">
+              Save Before You Go
+            </h2>
+            <p className="mt-4 leading-7 text-ink">
+              Save these to your phone before the trip so they're available without service.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {downloads.map((item) => (
+              <DownloadCard key={item.href} item={item} />
+            ))}
+            <DownloadPlaceholder title="Amsterdam Map" />
+            <DownloadPlaceholder title="Edinburgh Map" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DownloadCard({ item }: { item: (typeof downloads)[number] }) {
+  return (
+    <article className="rounded-md border border-brass/25 bg-parchment p-4">
+      <h3 className="font-serif text-2xl leading-tight text-highland">
+        {item.title}
+      </h3>
+      <a className="action-button mt-4 min-h-12 w-full justify-center px-4" href={item.href} download={item.fileName}>
+        <Download aria-hidden="true" size={16} />
+        {item.label}
+      </a>
+    </article>
+  );
+}
+
+function DownloadPlaceholder({ title }: { title: string }) {
+  return (
+    <article className="rounded-md border border-brass/25 bg-parchment/75 p-4">
+      <h3 className="font-serif text-2xl leading-tight text-highland">
+        {title}
+      </h3>
+      <span className="action-button action-button-disabled mt-4 min-h-12 w-full justify-center px-4" aria-disabled="true">
+        Coming Soon
+      </span>
+    </article>
   );
 }
 
@@ -128,6 +205,10 @@ function Overview() {
           <p className="mt-6 max-w-md text-lg leading-8 text-ink">
             Everything for the adventure in one place — where you're going, what you're doing, and the little details worth remembering.
           </p>
+          <a className="action-button mt-6 min-h-12 px-4" href="/downloads/trip-guide.pdf" download="Diana-Mina-European-Adventure-Trip-Guide.pdf">
+            <Download aria-hidden="true" size={16} />
+            Download Trip Guide PDF
+          </a>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
           <DestinationPanel title="Amsterdam" tone="amsterdam" />
@@ -289,6 +370,10 @@ function RecommendationsPage() {
               <PhoneCall aria-hidden="true" size={16} />
               Emergency
             </a>
+            <a className="action-button min-h-12 px-4" href="/downloads/dezrecs.pdf" download="Diana-Mina-Amsterdam-Recommendations.pdf">
+              <Download aria-hidden="true" size={16} />
+              Download dezrecs PDF
+            </a>
           </div>
           <header className="relative py-16 sm:py-24">
             <CanalHouses className="mb-8 h-24 w-36 text-canal opacity-65" />
@@ -335,6 +420,10 @@ function EmergencyPage() {
               <EmergencyNumberCard city="Amsterdam" number="112" href="tel:112" />
               <EmergencyNumberCard city="Edinburgh" number="999" href="tel:999" secondaryNumber="112" secondaryHref="tel:112" />
             </div>
+            <a className="action-button mt-5 min-h-12 px-4" href="/downloads/emergency.pdf" download="Diana-Mina-Emergency-Contacts.pdf">
+              <Download aria-hidden="true" size={16} />
+              Download Emergency PDF
+            </a>
           </section>
 
           <QuickCallGuide />
