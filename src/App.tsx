@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, MapPin } from "lucide-react";
 import { RecommendationsList } from "./components/Recommendations";
 import { recommendations } from "./data/recommendations";
+import { scotlandConsiderations } from "./data/scotland";
 
 const recommendationsPath = "/desmonds-amsterdam-recommendations";
 const amsterdamPhoto = "/images/amsterdam/amsterdam-canal.jpg";
@@ -141,6 +142,7 @@ function DestinationPanel({ title, tone }: { title: string; tone: "scotland" | "
 
 function DestinationSection({ id, title, tone, showImage = false }: { id: string; title: string; tone: "scotland" | "amsterdam"; showImage?: boolean }) {
   const isAmsterdam = id === "amsterdam";
+  const isScotland = id === "scotland";
 
   return (
     <section id={id} className="scroll-mt-32 px-6 py-20 sm:px-10 lg:px-20">
@@ -162,6 +164,7 @@ function DestinationSection({ id, title, tone, showImage = false }: { id: string
             <Thistle className="h-32 w-28 opacity-55" />
           )}
           <p className="mt-8 font-serif text-3xl text-highland">Coming Soon</p>
+          {isScotland ? <ScotlandConsiderations /> : null}
         </div>
       </div>
     </section>
@@ -187,6 +190,44 @@ function AmsterdamHomeBase() {
           <MapPin aria-hidden="true" size={16} />
           Open in Maps
         </a>
+      </div>
+    </div>
+  );
+}
+
+function ScotlandConsiderations() {
+  return (
+    <div className="mt-10 border-t border-brass/30 pt-8">
+      <div className="mb-6">
+        <h3 className="font-serif text-4xl leading-tight text-highland sm:text-5xl">
+          Places You're Considering
+        </h3>
+        <p className="mt-3 max-w-xl leading-7 text-ink">
+          Some ideas for your time in and around Edinburgh.
+        </p>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {scotlandConsiderations.map((place) => (
+          <article
+            key={place.name}
+            className="rounded-md border border-brass/25 bg-cream/85 p-5 shadow-soft"
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h4 className="font-serif text-2xl leading-tight text-highland">
+                  {place.name}
+                </h4>
+                <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] text-moss">
+                  {place.location}
+                </p>
+              </div>
+              <a className="action-button min-h-12 px-4" href={place.mapsUrl} target="_blank" rel="noreferrer">
+                <MapPin aria-hidden="true" size={16} />
+                Open in Maps
+              </a>
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   );
