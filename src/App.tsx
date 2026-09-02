@@ -254,7 +254,6 @@ function DestinationSection({ id, title, tone, showImage = false }: { id: string
           ) : (
             <Thistle className="h-32 w-28 opacity-55" />
           )}
-          <p className="mt-8 font-serif text-3xl text-highland">Coming Soon</p>
           <DestinationConsiderations id={isScotland ? "scotland" : "amsterdam"} />
         </div>
       </div>
