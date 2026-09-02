@@ -388,6 +388,13 @@ function generateDezrecs() {
       if (recommendation.personalNote) {
         doc.paragraph(recommendation.personalNote, { size: 12, leading: 16 });
       }
+      if (recommendation.historicalCost) {
+        doc.label(recommendation.historicalCost.label, colors.canal);
+        doc.paragraph(recommendation.historicalCost.value, { size: 15, font: "times-bold", color: colors.navy, leading: 18 });
+        if (recommendation.historicalCost.note) {
+          doc.paragraph(recommendation.historicalCost.note, { size: 10, font: "bold", color: colors.moss, leading: 13 });
+        }
+      }
       if (recommendation.images?.length) {
         recommendation.images.slice(0, 3).forEach((image) => {
           doc.image(image.src, { height: recommendation.images.length === 1 ? 155 : 105 });
@@ -402,7 +409,7 @@ function generateDezrecs() {
       if (recommendation.reservationUrl === null) {
         doc.paragraph("Reservation Link Coming Soon", { size: 10, font: "bold", color: colors.moss });
       } else if (recommendation.reservationUrl) {
-        doc.button("Reservation", recommendation.reservationUrl);
+        doc.button(recommendation.reservationLabel ?? "Reservation", recommendation.reservationUrl);
       }
       doc.y += 8;
       doc.line(doc.margin, doc.y, doc.width - doc.margin, doc.y, colors.brass, 0.4);

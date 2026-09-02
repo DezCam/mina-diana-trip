@@ -11,7 +11,13 @@ export type Recommendation = {
   }[];
   mapsUrl?: string;
   reservationUrl?: string | null;
+  reservationLabel?: string;
   proximityNote?: string;
+  historicalCost?: {
+    label: string;
+    value: string;
+    note?: string;
+  };
   continueTo?: {
     id: string;
     label: string;
@@ -128,7 +134,16 @@ export const recommendations: Recommendation[] = [
     category: "Boat Tour",
     shortRecommendation:
       "The Boat tour company, Flagship Amsterdam, was incredible — the tour is a must. It was a great way to explore the city, Drinks were included and I recommend doing this early on in the trip.",
-    reservationUrl: null,
+    personalNote:
+      "Totally worth it. I recommend doing this as early as possible in your trip.",
+    historicalCost: {
+      label: "What we paid",
+      value: "$122.58 total for three people",
+      note: "Prices may change.",
+    },
+    reservationUrl:
+      "https://www.getyourguide.com/amsterdam-l36/amsterdam-luxury-canal-cruise-with-unlimited-drinks-bite-t396132/?utm_medium=sharing&utm_campaign=activity_details_ios",
+    reservationLabel: "Book Canal Cruise",
     images: [
       {
         src: "/images/recommendations/flagship-amsterdam/flagship-amsterdam-boat-tour.jpeg",

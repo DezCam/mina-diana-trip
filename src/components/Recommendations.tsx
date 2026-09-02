@@ -78,6 +78,21 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
             {recommendation.personalNote}
           </p>
         ) : null}
+        {recommendation.historicalCost ? (
+          <div className="mt-5 rounded-md border border-brass/30 bg-parchment/75 p-4">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-canal">
+              {recommendation.historicalCost.label}
+            </p>
+            <p className="mt-2 font-serif text-2xl leading-tight text-highland">
+              {recommendation.historicalCost.value}
+            </p>
+            {recommendation.historicalCost.note ? (
+              <p className="mt-2 text-sm font-bold text-moss">
+                {recommendation.historicalCost.note}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
         {recommendation.continueTo ? (
           <a
             className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md border border-brass/30 bg-parchment px-4 text-xs font-bold uppercase tracking-[0.14em] text-canal transition hover:bg-canal/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip"
@@ -111,7 +126,7 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
           {recommendation.reservationUrl ? (
             <a className="action-button min-h-12 px-4" href={recommendation.reservationUrl} target="_blank" rel="noreferrer">
               <ExternalLink aria-hidden="true" size={16} />
-              Reservation
+              {recommendation.reservationLabel ?? "Reservation"}
             </a>
           ) : null}
         </div>
