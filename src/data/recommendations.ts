@@ -80,10 +80,6 @@ export const recommendations: Recommendation[] = [
     shortRecommendation:
       "The fellas and I stopped here for good beers and vibes after shopping and wandering.",
     proximityNote: "Near De Pijp",
-    continueTo: {
-      id: "coffeeshop-roxy",
-      label: "Nearby stop: Coffeeshop Roxy",
-    },
     mapsUrl: "https://maps.app.goo.gl/VtotJiniCWz3TW8M9",
     images: [
       {
