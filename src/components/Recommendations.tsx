@@ -29,18 +29,7 @@ export function RecommendationsList({ recommendations }: RecommendationsListProp
             </div>
             <div className="grid gap-7">
               {groupRecommendations.map((recommendation) => (
-                <div key={recommendation.id}>
-                  <RecommendationCard recommendation={recommendation} />
-                  {recommendation.continueTo ? (
-                    <a
-                      className="mx-auto mt-4 inline-flex min-h-11 items-center gap-2 rounded-md border border-brass/30 bg-parchment px-4 text-xs font-bold uppercase tracking-[0.14em] text-canal transition hover:bg-canal/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip"
-                      href={`#${recommendation.continueTo.id}`}
-                    >
-                      {recommendation.continueTo.label}
-                      <ArrowRight aria-hidden="true" size={15} />
-                    </a>
-                  ) : null}
-                </div>
+                <RecommendationCard key={recommendation.id} recommendation={recommendation} />
               ))}
             </div>
           </section>
@@ -88,6 +77,15 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
           <p className="mt-4 border-l border-brass/55 pl-4 text-base leading-7 text-ink/80 sm:text-lg">
             {recommendation.personalNote}
           </p>
+        ) : null}
+        {recommendation.continueTo ? (
+          <a
+            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md border border-brass/30 bg-parchment px-4 text-xs font-bold uppercase tracking-[0.14em] text-canal transition hover:bg-canal/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip"
+            href={`#${recommendation.continueTo.id}`}
+          >
+            {recommendation.continueTo.label}
+            <ArrowRight aria-hidden="true" size={15} />
+          </a>
         ) : null}
         <div className="mt-5 flex flex-wrap gap-3">
           {recommendation.proximityNote ? (

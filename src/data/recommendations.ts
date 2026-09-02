@@ -67,6 +67,36 @@ export const recommendations: Recommendation[] = [
     images: [],
   },
   {
+    id: "cafe-de-baron",
+    name: "Cafe De Baron",
+    group: "food-drink",
+    category: "Drinks",
+    shortRecommendation:
+      "The fellas and I stopped here for good beers and vibes after shopping and wandering.",
+    proximityNote: "Near De Pijp",
+    continueTo: {
+      id: "coffeeshop-roxy",
+      label: "Nearby stop: Coffeeshop Roxy",
+    },
+    mapsUrl: "https://maps.app.goo.gl/VtotJiniCWz3TW8M9",
+    images: [
+      {
+        src: "/images/recommendations/cafe-de-baron/cafe-de-baron-exterior.jpeg",
+        alt: "Exterior of Cafe De Baron in Amsterdam",
+      },
+    ],
+  },
+  {
+    id: "coffeeshop-roxy",
+    name: "Coffeeshop Roxy",
+    group: "food-drink",
+    category: "Coffeeshop",
+    shortRecommendation:
+      "Just up the street from Cafe De Baron. I stopped here after beers :). Bring cash.",
+    mapsUrl: "https://maps.app.goo.gl/XtEhjwkDedbdj4j89",
+    images: [],
+  },
+  {
     id: "weteringsplantsoen",
     name: "Weteringsplantsoen",
     group: "things-to-do",
