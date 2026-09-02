@@ -31,7 +31,7 @@ const amsterdamSectionPhoto = "/images/amsterdam/amsterdam-section.jpg";
 const scotlandPhoto = "/images/scotland/edinburgh.jpg";
 const headerMark = "/images/branding/castle-windmill.png";
 const siteTitle = "Diana & Mina's European Adventure";
-const hotelMapsUrl = "https://maps.app.goo.gl/XGjTeYouGkLRFCEk7";
+const hotelMapsUrl = "https://maps.app.goo.gl/GzzUFzn2gMcURruFA";
 
 export default function App() {
   if (window.location.pathname === recommendationsPath) {
@@ -268,13 +268,16 @@ function AmsterdamHomeBase() {
       <div className="mt-4 grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
         <div>
           <h3 className="font-serif text-3xl leading-tight text-highland sm:text-4xl">
-            Hotel Espresso City Centre
+            Max Brown Hotel Museum Square
           </h3>
           <address className="mt-4 not-italic leading-7 text-ink">
-            Overtoom 57
+            Jan Luijkenstraat 13-15
             <br />
-            1054 HC Amsterdam
+            1071 CJ Amsterdam
           </address>
+          <p className="mt-4 leading-7 text-ink">
+            Perfect location in Oud-Zuid – walking distance to everything below
+          </p>
         </div>
         <a className="action-button min-h-12 px-4" href={hotelMapsUrl} target="_blank" rel="noreferrer">
           <MapPin aria-hidden="true" size={16} />

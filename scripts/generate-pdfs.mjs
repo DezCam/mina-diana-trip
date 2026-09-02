@@ -360,8 +360,11 @@ function generateTripGuide() {
   doc.heading("Amsterdam", 2);
   doc.image("/images/amsterdam/amsterdam-section.jpg", { height: 135 });
   doc.label("Amsterdam Home Base");
-  doc.paragraph("Hotel Espresso City Centre", { size: 18, font: "times-bold", color: colors.navy, leading: 22 });
-  doc.paragraph("Overtoom 57\n1054 HC Amsterdam", { size: 12, leading: 16 });
+  doc.paragraph("Max Brown Hotel Museum Square", { size: 18, font: "times-bold", color: colors.navy, leading: 22 });
+  doc.paragraph("Jan Luijkenstraat 13-15\n1071 CJ Amsterdam", { size: 12, leading: 16 });
+  doc.paragraph("Perfect location in Oud-Zuid – walking distance to everything below", { size: 12, leading: 16 });
+  doc.button("Open in Maps", "https://maps.app.goo.gl/GzzUFzn2gMcURruFA", { width: 120, height: 26 });
+  doc.y += 18;
   addConsiderationGroups(doc, "amsterdam");
   doc.heading("Scotland", 2);
   doc.image("/images/scotland/edinburgh.jpg", { height: 135 });
