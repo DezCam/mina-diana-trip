@@ -96,7 +96,7 @@ export const recommendations: Recommendation[] = [
     id: "coffeeshop-roxy",
     name: "Coffeeshop Roxy",
     group: "food-drink",
-    category: "Coffeeshop",
+    category: "Cannabis Coffeeshop",
     shortRecommendation:
       "Just up the street from Cafe De Baron. I stopped here after beers :). Bring cash.",
     mapsUrl: "https://maps.app.goo.gl/XtEhjwkDedbdj4j89",
