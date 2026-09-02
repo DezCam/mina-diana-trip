@@ -395,6 +395,10 @@ function generateDezrecs() {
           doc.paragraph(recommendation.historicalCost.note, { size: 10, font: "bold", color: colors.moss, leading: 13 });
         }
       }
+      if (recommendation.video) {
+        doc.label(recommendation.video.title, colors.canal);
+        doc.button(recommendation.video.url, recommendation.video.url, { width: 235, height: 28 });
+      }
       if (recommendation.images?.length) {
         recommendation.images.slice(0, 3).forEach((image) => {
           doc.image(image.src, { height: recommendation.images.length === 1 ? 155 : 105 });

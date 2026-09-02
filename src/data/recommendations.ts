@@ -18,6 +18,11 @@ export type Recommendation = {
     value: string;
     note?: string;
   };
+  video?: {
+    title: string;
+    url: string;
+    embedUrl: string;
+  };
   continueTo?: {
     id: string;
     label: string;
@@ -107,9 +112,10 @@ export const recommendations: Recommendation[] = [
       "An incredible park that you have to see. It's an easy walk and close by.",
     personalNote:
       "I recommend walking through here on your way to the Bloemenmarkt.",
-    continueTo: {
-      id: "bloemenmarkt",
-      label: "Continue to Bloemenmarkt",
+    video: {
+      title: "Desmond's Walk to Bloemenmarkt",
+      url: "https://youtu.be/EhSwr5h30Hg",
+      embedUrl: "https://www.youtube-nocookie.com/embed/EhSwr5h30Hg",
     },
     mapsUrl: "https://maps.app.goo.gl/bMNoKkDEnjBvWJQ77",
     images: [],
@@ -119,7 +125,6 @@ export const recommendations: Recommendation[] = [
     name: "Bloemenmarkt",
     group: "things-to-do",
     category: "Flower Market",
-    personalNote: "Pair this with the walk through Weteringsplantsoen.",
     mapsUrl: "https://maps.app.goo.gl/KrUW66brx1A87XJ5A",
     images: [],
   },
