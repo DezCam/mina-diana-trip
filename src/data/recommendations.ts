@@ -126,7 +126,16 @@ export const recommendations: Recommendation[] = [
     group: "things-to-do",
     category: "Flower Market",
     mapsUrl: "https://maps.app.goo.gl/KrUW66brx1A87XJ5A",
-    images: [],
+    images: [
+      {
+        src: "/images/recommendations/bloemenmarkt/bloemenmarkt-market-stalls.jpeg",
+        alt: "Bloemenmarkt market stalls in Amsterdam",
+      },
+      {
+        src: "/images/recommendations/bloemenmarkt/bloemenmarkt-market-selfie.jpeg",
+        alt: "Bloemenmarkt market stalls in Amsterdam",
+      },
+    ],
   },
   {
     id: "flagship-amsterdam",
