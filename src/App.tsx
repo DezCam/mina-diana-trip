@@ -1,8 +1,8 @@
 import { ArrowLeft, ArrowRight, Download, MapPin, PhoneCall } from "lucide-react";
 import { RecommendationsList } from "./components/Recommendations";
+import { getDestinationConsiderations } from "./data/considerations";
 import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "./data/emergency";
 import { recommendations } from "./data/recommendations";
-import { scotlandConsiderations } from "./data/scotland";
 
 const recommendationsPath = "/desmonds-amsterdam-recommendations";
 const emergencyPath = "/emergency";
@@ -255,7 +255,7 @@ function DestinationSection({ id, title, tone, showImage = false }: { id: string
             <Thistle className="h-32 w-28 opacity-55" />
           )}
           <p className="mt-8 font-serif text-3xl text-highland">Coming Soon</p>
-          {isScotland ? <ScotlandConsiderations /> : null}
+          <DestinationConsiderations id={isScotland ? "scotland" : "amsterdam"} />
         </div>
       </div>
     </section>
@@ -286,38 +286,54 @@ function AmsterdamHomeBase() {
   );
 }
 
-function ScotlandConsiderations() {
+function DestinationConsiderations({ id }: { id: "amsterdam" | "scotland" }) {
+  const considerations = getDestinationConsiderations(id);
+
+  if (!considerations) return null;
+
   return (
     <div className="mt-10 border-t border-brass/30 pt-8">
       <div className="mb-6">
         <h3 className="font-serif text-4xl leading-tight text-highland sm:text-5xl">
-          Places You're Considering
+          {considerations.title}
         </h3>
         <p className="mt-3 max-w-xl leading-7 text-ink">
-          Some ideas for your time in and around Edinburgh.
+          {considerations.intro}
         </p>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        {scotlandConsiderations.map((place) => (
-          <article
-            key={place.name}
-            className="rounded-md border border-brass/25 bg-cream/85 p-5 shadow-soft"
-          >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h4 className="font-serif text-2xl leading-tight text-highland">
-                  {place.name}
-                </h4>
-                <p className="mt-1 text-sm font-bold uppercase tracking-[0.14em] text-moss">
-                  {place.location}
-                </p>
-              </div>
-              <a className="action-button min-h-12 px-4" href={place.mapsUrl} target="_blank" rel="noreferrer">
-                <MapPin aria-hidden="true" size={16} />
-                Open in Maps
-              </a>
+      <div className="grid gap-8">
+        {considerations.groups.map((group) => (
+          <section key={group.id} aria-labelledby={`${id}-${group.id}`}>
+            <div className="mb-4 flex items-center gap-4">
+              <h4 id={`${id}-${group.id}`} className="font-serif text-3xl leading-tight text-highland">
+                {group.label}
+              </h4>
+              <span className="h-px flex-1 bg-brass/35" aria-hidden="true" />
             </div>
-          </article>
+            <div className="grid gap-3 md:grid-cols-2">
+              {group.places.map((place) => (
+                <article
+                  key={place.id}
+                  className="rounded-md border border-brass/25 bg-cream/85 p-5 shadow-soft"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h5 className="font-serif text-2xl leading-tight text-highland">
+                        {place.name}
+                      </h5>
+                      <p className={`mt-1 text-sm font-bold uppercase tracking-[0.14em] ${place.country === "England" ? "text-heather" : "text-moss"}`}>
+                        {place.location}
+                      </p>
+                    </div>
+                    <a className="action-button min-h-12 px-4" href={place.mapsUrl} target="_blank" rel="noreferrer">
+                      <MapPin aria-hidden="true" size={16} />
+                      Open in Maps
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </div>

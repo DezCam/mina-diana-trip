@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { destinationConsiderations } from "../src/data/considerations.ts";
 import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "../src/data/emergency.ts";
 import { recommendationGroups, recommendations } from "../src/data/recommendations.ts";
-import { scotlandConsiderations } from "../src/data/scotland.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -328,13 +328,30 @@ function createDoc(title) {
   return doc;
 }
 
-function addPlaceList(doc) {
-  scotlandConsiderations.forEach((place) => {
-    doc.ensure(58);
-    doc.label(place.location, place.location === "England" ? colors.heather : colors.moss);
-    doc.paragraph(place.name, { size: 16, font: "times-bold", color: colors.navy, leading: 20 });
-    doc.button("Open in Maps", place.mapsUrl, { width: 120, height: 26 });
-    doc.y += 4;
+function addConsiderationGroups(doc, destinationId) {
+  const destination = destinationConsiderations.find((item) => item.id === destinationId);
+  if (!destination) return;
+
+  doc.paragraph(destination.title, { size: 18, font: "times-bold", color: colors.navy, leading: 22 });
+  if (destination.intro) {
+    doc.paragraph(destination.intro, { size: 11 });
+  }
+
+  destination.groups.forEach((group) => {
+    doc.ensure(42);
+    doc.label(group.label, colors.heather);
+    group.places.forEach((place) => {
+      doc.ensure(66);
+      doc.paragraph(place.name, { size: 15, font: "times-bold", color: colors.navy, leading: 18 });
+      doc.paragraph(place.location, {
+        size: 9,
+        font: "bold",
+        color: place.country === "England" ? colors.heather : colors.moss,
+        leading: 12,
+      });
+      doc.button("Open in Maps", place.mapsUrl, { width: 120, height: 26 });
+      doc.y += 2;
+    });
   });
 }
 
@@ -345,11 +362,10 @@ function generateTripGuide() {
   doc.label("Amsterdam Home Base");
   doc.paragraph("Hotel Espresso City Centre", { size: 18, font: "times-bold", color: colors.navy, leading: 22 });
   doc.paragraph("Overtoom 57\n1054 HC Amsterdam", { size: 12, leading: 16 });
+  addConsiderationGroups(doc, "amsterdam");
   doc.heading("Scotland", 2);
   doc.image("/images/scotland/edinburgh.jpg", { height: 135 });
-  doc.paragraph("Places You're Considering", { size: 18, font: "times-bold", color: colors.navy, leading: 22 });
-  doc.paragraph("Some ideas for your time in and around Edinburgh.", { size: 11 });
-  addPlaceList(doc);
+  addConsiderationGroups(doc, "scotland");
   doc.save(path.join(downloadsDir, "trip-guide.pdf"));
 }
 
