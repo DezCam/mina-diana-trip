@@ -126,7 +126,20 @@ export const recommendations: Recommendation[] = [
       embedUrl: "https://www.youtube-nocookie.com/embed/EhSwr5h30Hg",
     },
     mapsUrl: "https://maps.app.goo.gl/bMNoKkDEnjBvWJQ77",
-    images: [],
+    images: [
+      {
+        src: "/images/recommendations/weteringsplantsoen/weteringsplantsoen-canal-path.jpeg",
+        alt: "Path by the canal at Weteringsplantsoen",
+      },
+      {
+        src: "/images/recommendations/weteringsplantsoen/weteringsplantsoen-park-walk.jpeg",
+        alt: "Weteringsplantsoen in Amsterdam",
+      },
+      {
+        src: "/images/recommendations/weteringsplantsoen/weteringsplantsoen-park.jpeg",
+        alt: "Park path through Weteringsplantsoen",
+      },
+    ],
   },
   {
     id: "bloemenmarkt",
