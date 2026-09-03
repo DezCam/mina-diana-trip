@@ -38,6 +38,10 @@ function cleanPdfText(value) {
   return value.replace(/\\\(/g, "(").replace(/\\\)/g, ")").replace(/\\\\/g, "\\");
 }
 
+function normalizeText(value) {
+  return cleanPdfText(value).replace(/\s+/g, " ").trim();
+}
+
 function estimateWidth(text, size, fontName) {
   const factor = fontName === "F4" || fontName === "F2" ? 0.49 : 0.52;
   return cleanPdfText(text).length * size * factor;
@@ -71,8 +75,9 @@ function extractTextBoxes(pdfText, file) {
       if (!value.trim()) return;
       const size = Number(rawSize);
       const x = Number(rawX);
-      const y = pageHeight - Number(rawY);
-      const h = size * 1.12;
+      const baselineY = pageHeight - Number(rawY);
+      const y = baselineY - size;
+      const h = size;
       const w = Math.max(4, estimateWidth(value, size, font));
       boxes.push({
         id: `${file}:p${pageIndex + 1}:t${textIndex}`,
@@ -89,7 +94,7 @@ function extractTextBoxes(pdfText, file) {
   return { boxes, pageWidth, pageHeight, pageCount: pageMatches.length };
 }
 
-function intersects(a, b, tolerance = 1.5) {
+function intersects(a, b, tolerance = 0) {
   return !(
     a.x + a.w <= b.x + tolerance ||
     b.x + b.w <= a.x + tolerance ||
@@ -114,7 +119,7 @@ function validateText(file, pdfText) {
       const a = boxes[i];
       const b = boxes[j];
       if (a.page !== b.page) continue;
-      if (intersects(a, b)) {
+      if (intersects(a, b, 0.75)) {
         errors.push(`${a.id} overlaps ${b.id}: "${a.text}" / "${b.text}"`);
       }
     }
@@ -125,6 +130,83 @@ function validateText(file, pdfText) {
   }
 
   return { pageCount, textBoxes: boxes.length };
+}
+
+function validateLayoutManifest() {
+  const layoutManifestPath = path.join(qaDir, "pdf-layout.json");
+  if (!fs.existsSync(layoutManifestPath)) throw new Error("Missing PDF layout manifest");
+  const layoutManifest = JSON.parse(fs.readFileSync(layoutManifestPath, "utf8"));
+  const errors = [];
+
+  for (const file of layoutManifest.files ?? []) {
+    for (const event of file.layout ?? []) {
+      if (event.type === "recommendation-header" && event.gap < 6) {
+        errors.push(`${file.file} ${event.title} category/title gap is ${event.gap}pt`);
+      }
+      if (event.type === "emergency-contact-row" && event.gap < 5) {
+        errors.push(`${file.file} ${event.number} label/value gap is ${event.gap}pt`);
+      }
+    }
+  }
+
+  const dezrecsLayout = layoutManifest.files?.find((file) => file.file === "dezrecs.pdf")?.layout ?? [];
+  const headerCount = dezrecsLayout.filter((event) => event.type === "recommendation-header").length;
+  if (headerCount !== recommendations.length) {
+    errors.push(`dezrecs.pdf has ${headerCount} recommendation headers; expected ${recommendations.length}`);
+  }
+
+  if (errors.length) {
+    throw new Error(`PDF semantic layout QA failed:\n${errors.join("\n")}`);
+  }
+
+  return layoutManifest;
+}
+
+function validateEmergencyContent(pdfText) {
+  const textValues = [
+    ...pdfText.matchAll(/BT \/(F\d) ([\d.]+) Tf ([\d.-]+) ([\d.-]+) Td \((.*?)\) Tj ET/g),
+  ].map((match) => normalizeText(match[5]));
+  const fullText = textValues.join("\n");
+  const detailNumbers = [
+    "+31 343 57 8844",
+    "+31 70 310 2209",
+    "+44 131 556 8315",
+    "+44 20 7499 9000",
+  ];
+  const errors = [];
+
+  for (const number of detailNumbers) {
+    const count = textValues.filter((value) => value === number).length;
+    if (count !== 1) {
+      errors.push(`${number} appears ${count} times as a detail value; expected 1`);
+    }
+    const duplicatePattern = new RegExp(`${number.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*:\\s*${number.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
+    if (duplicatePattern.test(fullText)) {
+      errors.push(`${number} is duplicated inside a contact row`);
+    }
+  }
+
+  if (/From an international\/foreign phone:\s*\+31 343 57 8844:\s*\+31 343 57 8844/.test(fullText)) {
+    errors.push("International Netherlands police row repeats its phone value");
+  }
+
+  if (errors.length) {
+    throw new Error(`emergency.pdf duplicate-number QA failed:\n${errors.join("\n")}`);
+  }
+}
+
+function validateDezrecsContent(pdfText) {
+  const fullText = [
+    ...pdfText.matchAll(/BT \/(F\d) ([\d.]+) Tf ([\d.-]+) ([\d.-]+) Td \((.*?)\) Tj ET/g),
+  ].map((match) => normalizeText(match[5])).join(" ");
+  const required = [
+    "This is where I bought the stroop waffle gift bags",
+    "they make the stroop waffles right in front of you.",
+  ];
+  const missing = required.filter((snippet) => !fullText.includes(snippet));
+  if (missing.length) {
+    throw new Error(`dezrecs.pdf is missing current Hans Egstorf copy: ${missing.join(", ")}`);
+  }
 }
 
 function validateManifest() {
@@ -191,6 +273,7 @@ function writeQaSummary(results, mapManifest) {
 }
 
 const mapManifest = validateManifest();
+const layoutManifest = validateLayoutManifest();
 const results = [];
 
 for (const file of requiredPdfs) {
@@ -203,6 +286,8 @@ for (const file of requiredPdfs) {
   }
   const pdfText = buffer.toString("latin1");
   const textResult = validateText(file, pdfText);
+  if (file === "emergency.pdf") validateEmergencyContent(pdfText);
+  if (file === "dezrecs.pdf") validateDezrecsContent(pdfText);
   results.push({ file, size: buffer.length, ...textResult });
 }
 

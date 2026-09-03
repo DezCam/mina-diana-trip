@@ -8,6 +8,7 @@
     "generate:maps": "node --experimental-strip-types scripts/generate-maps.mjs",
     "generate:pdfs": "node --experimental-strip-types scripts/generate-pdfs.mjs",
     "verify:pdfs": "node --experimental-strip-types scripts/verify-pdfs.mjs",
+    "qa:pdfs": "node --experimental-strip-types scripts/render-pdf-qa.mjs",
     "build:web": "tsc -b && vite build",
     "build": "npm run generate:maps && npm run generate:pdfs && npm run verify:pdfs && npm run build:web",
     "preview": "vite preview --host 127.0.0.1"
@@ -22,9 +23,11 @@
     "vite": "^7.0.0"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^1.0.8",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.20",
+    "pdfjs-dist": "^6.3.289",
     "playwright": "^1.62.1",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17"

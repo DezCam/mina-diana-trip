@@ -8,6 +8,7 @@ import { recommendationGroups, recommendations, recommendationsIntroVideo } from
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const downloadsDir = path.join(root, "public", "downloads");
+const qaDir = path.join(root, "artifacts", "pdf-qa");
 const siteTitle = "Diana & Mina's European Adventure";
 const updated = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
@@ -89,6 +90,34 @@ function parseJpegDimensions(buffer) {
   throw new Error("Could not read JPEG dimensions");
 }
 
+function imageDimensions(src) {
+  const fullPath = path.join(root, "public", src.replace(/^\//, ""));
+  if (!fs.existsSync(fullPath)) return null;
+  return parseJpegDimensions(fs.readFileSync(fullPath));
+}
+
+function imageDisplaySize(src, options = {}) {
+  const dimensions = imageDimensions(src);
+  if (!dimensions) return null;
+  const maxW = options.width ?? 512;
+  const maxH = options.height ?? 150;
+  const scale = Math.min(maxW / dimensions.width, maxH / dimensions.height, 1);
+  return {
+    width: dimensions.width * scale,
+    height: dimensions.height * scale,
+  };
+}
+
+function paragraphHeight(text, options = {}, docWidth = 612, margin = 50) {
+  if (!text) return 0;
+  const size = options.size ?? 11;
+  const leading = options.leading ?? 15;
+  const width = options.width ?? docWidth - margin * 2;
+  return cleanText(text)
+    .split(/\n/)
+    .reduce((total, line) => total + wrapText(line, width, size, options.font ?? "helvetica").length * leading + 7, 0);
+}
+
 class PdfDoc {
   constructor(title) {
     this.title = title;
@@ -102,6 +131,7 @@ class PdfDoc {
     this.pages = [];
     this.current = null;
     this.imageCache = new Map();
+    this.layoutEvents = [];
   }
 
   alloc() {
@@ -158,8 +188,9 @@ class PdfDoc {
     this.setFill(color);
     const fontName = font === "times-bold" ? "F4" : font === "times" ? "F2" : font === "bold" ? "F3" : "F1";
     lines.forEach((line, index) => {
-      const lineY = y + index * leading;
-      this.current.commands.push(`BT /${fontName} ${size} Tf ${x.toFixed(2)} ${(this.height - lineY).toFixed(2)} Td (${contentString(line)}) Tj ET`);
+      const lineTop = y + index * leading;
+      const baselineY = lineTop + size;
+      this.current.commands.push(`BT /${fontName} ${size} Tf ${x.toFixed(2)} ${(this.height - baselineY).toFixed(2)} Td (${contentString(line)}) Tj ET`);
     });
     return lines.length * leading;
   }
@@ -217,7 +248,7 @@ class PdfDoc {
     this.rect(x, y, w, h, "f");
     this.setStroke(colors.brass);
     this.rect(x, y, w, h, "S");
-    this.text(label, x + 12, y + 19, {
+    this.text(label, x + 12, y + 10, {
       size: 9,
       font: "bold",
       color: options.primary ? colors.white : colors.navy,
@@ -266,6 +297,13 @@ class PdfDoc {
     this.paragraph(`Updated: ${updated}`, { size: 9, color: colors.moss });
     this.line(this.margin, this.y + 4, this.width - this.margin, this.y + 4);
     this.y += 18;
+  }
+
+  recordLayout(event) {
+    this.layoutEvents.push({
+      page: this.pages.length,
+      ...event,
+    });
   }
 
   save(filePath) {
@@ -334,7 +372,7 @@ function sourceHash(value) {
 }
 
 function writeManifest(entries) {
-  const manifestPath = path.join(root, "artifacts", "pdf-qa", "manifest.json");
+  const manifestPath = path.join(qaDir, "manifest.json");
   fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
   fs.writeFileSync(
     manifestPath,
@@ -349,6 +387,123 @@ function writeManifest(entries) {
   );
 }
 
+function writeLayoutManifest(layouts) {
+  fs.mkdirSync(qaDir, { recursive: true });
+  fs.writeFileSync(path.join(qaDir, "pdf-layout.json"), JSON.stringify(layouts, null, 2));
+}
+
+function sectionHeader(doc, label) {
+  doc.ensure(68);
+  const headingTop = doc.y;
+  const headingHeight = doc.text(label, doc.margin, headingTop, {
+    size: 24,
+    font: "times-bold",
+    color: colors.canal,
+    leading: 28,
+  });
+  doc.y += headingHeight + 12;
+  doc.line(doc.margin, doc.y, doc.width - doc.margin, doc.y, colors.brass, 0.6);
+  doc.y += 20;
+}
+
+function recommendationIntroHeight(recommendation) {
+  let height = 9 * 1.25 + 7;
+  height += wrapText(recommendation.name, 512, 20, "times-bold").length * 24 + 12;
+  height += paragraphHeight(recommendation.proximityNote, { size: 10, leading: 13, font: "bold" });
+  height += paragraphHeight(recommendation.shortRecommendation, { size: 12, leading: 16 });
+  height += paragraphHeight(recommendation.personalNote, { size: 12, leading: 16 });
+  if (recommendation.historicalCost) height += 58;
+  if (recommendation.video) height += 56;
+  const firstImage = recommendation.images?.[0];
+  if (firstImage) {
+    const display = imageDisplaySize(firstImage.src, {
+      width: recommendation.images.length === 1 ? 340 : 230,
+      height: recommendation.images.length === 1 ? 170 : 125,
+    });
+    height += (display?.height ?? 0) + 12;
+  }
+  height += recommendation.mapsUrl || recommendation.websiteUrl || recommendation.reservationUrl ? 42 : 0;
+  return Math.min(Math.max(height, 120), 360);
+}
+
+function recommendationHeader(doc, recommendation, groupLabel) {
+  const category = recommendation.category ?? groupLabel;
+  const categoryTop = doc.y;
+  const categoryHeight = doc.text(category.toUpperCase(), doc.margin, categoryTop, {
+    size: 9,
+    font: "bold",
+    color: colors.heather,
+    leading: 11.25,
+    width: doc.width - doc.margin * 2,
+  });
+  doc.y += categoryHeight + 7;
+  const titleTop = doc.y;
+  const titleHeight = doc.text(recommendation.name, doc.margin, titleTop, {
+    size: 20,
+    font: "times-bold",
+    color: colors.navy,
+    leading: 24,
+    width: doc.width - doc.margin * 2,
+  });
+  const gap = titleTop - (categoryTop + categoryHeight);
+  if (gap < 6) {
+    throw new Error(`${recommendation.name} PDF header gap is ${gap.toFixed(2)}pt`);
+  }
+  doc.recordLayout({
+    type: "recommendation-header",
+    id: recommendation.id,
+    category,
+    title: recommendation.name,
+    categoryBottom: Number((categoryTop + categoryHeight).toFixed(2)),
+    titleTop: Number(titleTop.toFixed(2)),
+    gap: Number(gap.toFixed(2)),
+  });
+  doc.y += titleHeight + 12;
+}
+
+function actionLabelWithoutNumber(action) {
+  let label = cleanText(action.label).trim();
+  const escapedNumber = action.number.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  label = label.replace(new RegExp(`\\s*:?\\s*${escapedNumber}\\s*$`), "").trim();
+  label = label.replace(/^Call\s*$/i, "").trim();
+  return label || "Telephone";
+}
+
+function contactActionRow(doc, action) {
+  const label = actionLabelWithoutNumber(action);
+  const labelTop = doc.y;
+  const labelHeight = doc.text(label, doc.margin, labelTop, {
+    size: 10,
+    font: "bold",
+    color: colors.moss,
+    leading: 13,
+    width: doc.width - doc.margin * 2,
+  });
+  doc.y += labelHeight + 6;
+  const valueTop = doc.y;
+  const valueHeight = doc.text(action.number, doc.margin, valueTop, {
+    size: 16,
+    font: "bold",
+    color: colors.navy,
+    leading: 20,
+    width: doc.width - doc.margin * 2,
+  });
+  doc.linkAnnotation(doc.margin, valueTop, estimateTextWidth(action.number, 16, "bold") + 8, valueHeight, action.href);
+  const gap = valueTop - (labelTop + labelHeight);
+  if (gap < 5) {
+    throw new Error(`${action.number} PDF contact-row gap is ${gap.toFixed(2)}pt`);
+  }
+  doc.recordLayout({
+    type: "emergency-contact-row",
+    label,
+    number: action.number,
+    labelBottom: Number((labelTop + labelHeight).toFixed(2)),
+    valueTop: Number(valueTop.toFixed(2)),
+    gap: Number(gap.toFixed(2)),
+  });
+  doc.y += valueHeight + 8;
+}
+
 function generateDezrecs() {
   const doc = createDoc("Desmond's Amsterdam Recommendations");
   doc.label(recommendationsIntroVideo.title, colors.canal);
@@ -358,11 +513,10 @@ function generateDezrecs() {
   recommendationGroups.forEach((group) => {
     const groupItems = recommendations.filter((recommendation) => recommendation.group === group.id);
     if (!groupItems.length) return;
-    doc.heading(group.label, 2);
+    sectionHeader(doc, group.label);
     groupItems.forEach((recommendation) => {
-      doc.ensure(95);
-      doc.label(recommendation.category ?? group.label, colors.heather);
-      doc.paragraph(recommendation.name, { size: 19, font: "times-bold", color: colors.navy, leading: 23 });
+      doc.ensure(recommendationIntroHeight(recommendation));
+      recommendationHeader(doc, recommendation, group.label);
       if (recommendation.proximityNote) {
         doc.paragraph(recommendation.proximityNote, { size: 10, font: "bold", color: colors.canal, leading: 13 });
       }
@@ -411,6 +565,7 @@ function generateDezrecs() {
   return {
     file: "dezrecs.pdf",
     sourceHash: sourceHash({ recommendationGroups, recommendations, recommendationsIntroVideo }),
+    layout: doc.layoutEvents,
   };
 }
 
@@ -460,8 +615,7 @@ function generateEmergency() {
         doc.paragraph(contact.description, { size: 9, leading: 12 });
       }
       contact.actions.filter((action) => action.number !== contact.number).forEach((action) => {
-        doc.paragraph(`${action.label}: ${action.number}`, { size: 10, font: "bold", color: colors.navy, leading: 13 });
-        doc.linkAnnotation(doc.margin, doc.y - 16, 220, 16, action.href);
+        contactActionRow(doc, action);
       });
       if (contact.warning) {
         doc.paragraph(contact.warning, { size: 10, font: "bold", color: colors.coral, leading: 13 });
@@ -480,11 +634,19 @@ function generateEmergency() {
   return {
     file: "emergency.pdf",
     sourceHash: sourceHash({ emergencyCities, quickCallGuide, stateDepartmentFallback }),
+    layout: doc.layoutEvents,
   };
 }
 
 const manifestEntries = [generateDezrecs(), generateEmergency()];
-writeManifest(manifestEntries);
+writeManifest(manifestEntries.map(({ layout, ...entry }) => entry));
+writeLayoutManifest({
+  generatedAt: new Date().toISOString(),
+  files: manifestEntries.map((entry) => ({
+    file: entry.file,
+    layout: entry.layout,
+  })),
+});
 
 for (const file of ["dezrecs.pdf", "emergency.pdf"]) {
   const target = path.join(downloadsDir, file);
