@@ -83,7 +83,24 @@ export const recommendations: Recommendation[] = [
     proximityNote: "Near where you're staying.",
     mapsUrl:
       "https://www.google.com/maps/place/Blushing/@52.3588108,4.8777835,17z/data=!3m1!4b1!4m6!3m5!1s0x47c609ef84312b37:0x3b945b98b15e15c7!8m2!3d52.3588108!4d4.8803584!16s%2Fg%2F11bw5x9_yx?entry=tts&g_ep=EgoyMDI2MDgyNi4wIPu8ASoASAFQAw%3D%3D&skid=4c4b1f09-deea-43f0-ac49-22ca0e355279",
-    images: [],
+    images: [
+      {
+        src: "/images/recommendations/blushing/blushing-food.jpeg",
+        alt: "Food at Blushing",
+      },
+      {
+        src: "/images/recommendations/blushing/blushing-counter.jpeg",
+        alt: "Counter inside Blushing",
+      },
+      {
+        src: "/images/recommendations/blushing/blushing-interior.jpeg",
+        alt: "Interior of Blushing",
+      },
+      {
+        src: "/images/recommendations/blushing/blushing-dining-room.jpeg",
+        alt: "Dining room inside Blushing",
+      },
+    ],
   },
   {
     id: "cafe-de-baron",
