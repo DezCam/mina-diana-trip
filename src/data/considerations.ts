@@ -60,6 +60,13 @@ export const destinationConsiderations: DestinationConsiderations[] = [
             country: "Netherlands",
             mapsUrl: mapSearch("De Pijp, Amsterdam, Netherlands"),
           },
+          {
+            id: "red-light-district",
+            name: "Red Light District",
+            location: "Amsterdam",
+            country: "Netherlands",
+            mapsUrl: "https://maps.app.goo.gl/utPdPXyiVXEJo6mg8",
+          },
         ],
       },
       {
