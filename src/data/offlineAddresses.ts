@@ -44,6 +44,12 @@ export const offlineAddresses: Record<string, OfflineAddress> = {
     status: "VERIFIED ADDRESS",
     sourceUrl: "https://maps.app.goo.gl/XtEhjwkDedbdj4j89",
   },
+  "house-of-rituals": {
+    id: "house-of-rituals",
+    lines: ["Spui 10", "1012 PR Amsterdam"],
+    status: "VERIFIED ADDRESS",
+    sourceUrl: "https://maps.app.goo.gl/1DBjhPfdNTB5WUx28",
+  },
   weteringsplantsoen: {
     id: "weteringsplantsoen",
     lines: ["Weteringsplantsoen", "Amsterdam", "Netherlands"],

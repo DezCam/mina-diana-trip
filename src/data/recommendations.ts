@@ -130,6 +130,31 @@ export const recommendations: Recommendation[] = [
     images: [],
   },
   {
+    id: "house-of-rituals",
+    name: "House of Rituals",
+    group: "food-drink",
+    category: "Coffee / Skincare Experience",
+    shortRecommendation:
+      "The guys and I got amazing coffee here. It's a coffee shop mixed into a skincare/wellness store — all one company, and the whole place is built to create an experience around their products.",
+    personalNote:
+      "Rituals seems to be pretty big in Amsterdam; I even noticed another expensive-looking property of theirs from the canal tour that was separate from this coffee/skincare location.",
+    mapsUrl: "https://maps.app.goo.gl/1DBjhPfdNTB5WUx28",
+    images: [
+      {
+        src: "/images/recommendations/house-of-rituals/house-of-rituals-food.jpeg",
+        alt: "Food at Rituals Café",
+      },
+      {
+        src: "/images/recommendations/house-of-rituals/house-of-rituals-dessert.jpeg",
+        alt: "Desserts at Rituals Café",
+      },
+      {
+        src: "/images/recommendations/house-of-rituals/house-of-rituals-store.jpeg",
+        alt: "Interior of House of Rituals",
+      },
+    ],
+  },
+  {
     id: "weteringsplantsoen",
     name: "Weteringsplantsoen",
     group: "things-to-do",
