@@ -1,7 +1,7 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { destinationConsiderations } from "../src/data/considerations.ts";
 import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "../src/data/emergency.ts";
 import { recommendationGroups, recommendations, recommendationsIntroVideo } from "../src/data/recommendations.ts";
 
@@ -245,21 +245,19 @@ class PdfDoc {
     }
 
     const x = options.x ?? this.margin;
-    const boxW = options.width ?? this.width - this.margin * 2;
-    const boxH = options.height ?? 150;
-    this.ensure(boxH + 12);
-    const scale = Math.min(boxW / width, boxH / height);
+    const maxW = options.width ?? this.width - this.margin * 2;
+    const maxH = options.height ?? 150;
+    const scale = Math.min(maxW / width, maxH / height, 1);
     const w = width * scale;
     const h = height * scale;
-    const drawX = x + (boxW - w) / 2;
-    const drawY = this.y + (boxH - h) / 2;
-    this.setFill(colors.cream);
-    this.rect(x, this.y, boxW, boxH, "f");
+    this.ensure(h + 12);
+    const drawX = x;
+    const drawY = this.y;
     this.current.xobjects.set(image.name, image.id);
     this.current.commands.push(`q ${w.toFixed(2)} 0 0 ${h.toFixed(2)} ${drawX.toFixed(2)} ${(this.height - drawY - h).toFixed(2)} cm /${image.name} Do Q`);
     this.setStroke(colors.brass);
-    this.rect(x, this.y, boxW, boxH, "S");
-    this.y += boxH + 10;
+    this.rect(drawX, drawY, w, h, "S");
+    this.y += h + 10;
   }
 
   header(type) {
@@ -328,54 +326,34 @@ function createDoc(title) {
   return doc;
 }
 
-function addConsiderationGroups(doc, destinationId) {
-  const destination = destinationConsiderations.find((item) => item.id === destinationId);
-  if (!destination) return;
-
-  doc.paragraph(destination.title, { size: 18, font: "times-bold", color: colors.navy, leading: 22 });
-  if (destination.intro) {
-    doc.paragraph(destination.intro, { size: 11 });
-  }
-
-  destination.groups.forEach((group) => {
-    doc.ensure(42);
-    doc.label(group.label, colors.heather);
-    group.places.forEach((place) => {
-      doc.ensure(66);
-      doc.paragraph(place.name, { size: 15, font: "times-bold", color: colors.navy, leading: 18 });
-      doc.paragraph(place.location, {
-        size: 9,
-        font: "bold",
-        color: place.country === "England" ? colors.heather : colors.moss,
-        leading: 12,
-      });
-      doc.button("Open in Maps", place.mapsUrl, { width: 120, height: 26 });
-      doc.y += 2;
-    });
-  });
+function sourceHash(value) {
+  return crypto
+    .createHash("sha256")
+    .update(JSON.stringify(value))
+    .digest("hex");
 }
 
-function generateTripGuide() {
-  const doc = createDoc("Trip Guide");
-  doc.heading("Amsterdam", 2);
-  doc.image("/images/amsterdam/amsterdam-section.jpg", { height: 135 });
-  doc.label("Amsterdam Home Base");
-  doc.paragraph("Max Brown Hotel Museum Square", { size: 18, font: "times-bold", color: colors.navy, leading: 22 });
-  doc.paragraph("Jan Luijkenstraat 13-15\n1071 CJ Amsterdam", { size: 12, leading: 16 });
-  doc.paragraph("Perfect location in Oud-Zuid – walking distance to everything below", { size: 12, leading: 16 });
-  doc.button("Open in Maps", "https://maps.app.goo.gl/GzzUFzn2gMcURruFA", { width: 120, height: 26 });
-  doc.y += 18;
-  addConsiderationGroups(doc, "amsterdam");
-  doc.heading("Scotland", 2);
-  doc.image("/images/scotland/edinburgh.jpg", { height: 135 });
-  addConsiderationGroups(doc, "scotland");
-  doc.save(path.join(downloadsDir, "trip-guide.pdf"));
+function writeManifest(entries) {
+  const manifestPath = path.join(root, "artifacts", "pdf-qa", "manifest.json");
+  fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
+  fs.writeFileSync(
+    manifestPath,
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        files: entries,
+      },
+      null,
+      2,
+    ),
+  );
 }
 
 function generateDezrecs() {
   const doc = createDoc("Desmond's Amsterdam Recommendations");
   doc.label(recommendationsIntroVideo.title, colors.canal);
-  doc.button(recommendationsIntroVideo.url, recommendationsIntroVideo.url, { width: 235, height: 28 });
+  doc.paragraph(recommendationsIntroVideo.url, { size: 11, font: "bold", color: colors.navy });
+  doc.linkAnnotation(doc.margin, doc.y - 28, 250, 18, recommendationsIntroVideo.url);
   doc.y += 10;
   recommendationGroups.forEach((group) => {
     const groupItems = recommendations.filter((recommendation) => recommendation.group === group.id);
@@ -407,7 +385,10 @@ function generateDezrecs() {
       }
       if (recommendation.images?.length) {
         recommendation.images.slice(0, 3).forEach((image) => {
-          doc.image(image.src, { height: recommendation.images.length === 1 ? 155 : 105 });
+          doc.image(image.src, {
+            width: recommendation.images.length === 1 ? 340 : 230,
+            height: recommendation.images.length === 1 ? 170 : 125,
+          });
         });
       }
       if (recommendation.mapsUrl) {
@@ -427,14 +408,29 @@ function generateDezrecs() {
     });
   });
   doc.save(path.join(downloadsDir, "dezrecs.pdf"));
+  return {
+    file: "dezrecs.pdf",
+    sourceHash: sourceHash({ recommendationGroups, recommendations, recommendationsIntroVideo }),
+  };
 }
 
 function generateEmergency() {
   const doc = createDoc("Emergency Contacts");
-  doc.label("Emergency", colors.coral);
-  doc.y += 6;
-  doc.paragraph("Call 112 in Amsterdam", { size: 20, font: "times-bold", color: colors.navy, leading: 25 });
-  doc.paragraph("Call 999 or 112 in Edinburgh", { size: 20, font: "times-bold", color: colors.navy, leading: 25 });
+  doc.label("Quick Emergency Numbers", colors.coral);
+  doc.paragraph("Amsterdam", { size: 14, font: "bold", color: colors.canal, leading: 18 });
+  doc.y += 12;
+  doc.paragraph("112", { size: 42, font: "bold", color: colors.navy, leading: 46 });
+  doc.linkAnnotation(doc.margin, doc.y - 55, 100, 48, "tel:112");
+  doc.y += 10;
+  doc.paragraph("Police / Ambulance / Fire", { size: 12, font: "bold", color: colors.ink, leading: 16 });
+  doc.y += 22;
+  doc.paragraph("Edinburgh", { size: 14, font: "bold", color: colors.moss, leading: 18 });
+  doc.y += 12;
+  doc.paragraph("999 / 112", { size: 42, font: "bold", color: colors.navy, leading: 46 });
+  doc.linkAnnotation(doc.margin, doc.y - 55, 160, 48, "tel:999");
+  doc.y += 10;
+  doc.paragraph("Police / Ambulance / Fire", { size: 12, font: "bold", color: colors.ink, leading: 16 });
+  doc.y += 16;
   doc.heading("What Do I Call?", 2);
   quickCallGuide.forEach((item) => {
     doc.paragraph(item.need, { size: 11, font: "bold", color: colors.ink, leading: 14 });
@@ -442,30 +438,30 @@ function generateEmergency() {
     doc.paragraph(`Edinburgh: ${item.edinburgh}`, { size: 11, color: colors.navy });
   });
 
-  emergencyCities.forEach((city) => {
-    doc.addPage();
-    doc.header("Emergency Contacts");
+  doc.addPage();
+  doc.header("Emergency Contacts");
+  emergencyCities.forEach((city, cityIndex) => {
+    if (cityIndex > 0) doc.y += 12;
     doc.heading(city.name.toUpperCase(), 2);
     city.contacts.forEach((contact) => {
-      doc.ensure(contact.title.includes("Consulate") ? 185 : 130);
+      doc.ensure(contact.title.includes("Consulate") ? 112 : 72);
       doc.label(contact.title, contact.title === "Emergency" ? colors.coral : colors.canal);
       if (contact.number) {
-        doc.paragraph(contact.number, { size: contact.title === "Emergency" ? 34 : 24, font: "bold", color: colors.navy, leading: contact.title === "Emergency" ? 38 : 28 });
+        doc.paragraph(contact.number, { size: contact.title === "Emergency" ? 28 : 20, font: "bold", color: colors.navy, leading: contact.title === "Emergency" ? 32 : 24 });
+        doc.linkAnnotation(doc.margin, doc.y - 34, 170, 28, `tel:${contact.number.replace(/[^\d+]/g, "")}`);
       }
       if (contact.label) {
-        doc.paragraph(contact.label, { size: 13, font: "bold", color: colors.ink, leading: 16 });
+        doc.paragraph(contact.label, { size: 11, font: "bold", color: colors.ink, leading: 14 });
       }
       if (contact.address) {
-        doc.paragraph(contact.address.join("\n"), { size: 11, leading: 15 });
+        doc.paragraph(contact.address.join("\n"), { size: 10, leading: 13 });
       }
       if (contact.description) {
-        doc.paragraph(contact.description, { size: 10, leading: 14 });
+        doc.paragraph(contact.description, { size: 9, leading: 12 });
       }
-      contact.actions.forEach((action) => {
-        if (action.emphasis !== "primary") {
-          doc.paragraph(action.label, { size: 10, font: "bold", color: colors.navy, leading: 13 });
-        }
-        doc.button(`Call ${action.number}`, action.href, { width: action.emphasis === "primary" ? 170 : 180, height: action.emphasis === "primary" ? 34 : 28, primary: action.emphasis === "primary" });
+      contact.actions.filter((action) => action.number !== contact.number).forEach((action) => {
+        doc.paragraph(`${action.label}: ${action.number}`, { size: 10, font: "bold", color: colors.navy, leading: 13 });
+        doc.linkAnnotation(doc.margin, doc.y - 16, 220, 16, action.href);
       });
       if (contact.warning) {
         doc.paragraph(contact.warning, { size: 10, font: "bold", color: colors.coral, leading: 13 });
@@ -474,20 +470,23 @@ function generateEmergency() {
     });
   });
 
-  doc.addPage();
-  doc.header("Emergency Contacts");
+  doc.ensure(135);
   doc.heading(stateDepartmentFallback.title, 2);
   doc.paragraph(stateDepartmentFallback.description, { size: 11 });
   doc.paragraph(stateDepartmentFallback.label, { size: 10, font: "bold", color: colors.moss });
-  doc.button(stateDepartmentFallback.number, stateDepartmentFallback.href, { width: 190, height: 30 });
+  doc.paragraph(stateDepartmentFallback.number, { size: 26, font: "bold", color: colors.navy, leading: 30 });
+  doc.linkAnnotation(doc.margin, doc.y - 36, 190, 30, stateDepartmentFallback.href);
   doc.save(path.join(downloadsDir, "emergency.pdf"));
+  return {
+    file: "emergency.pdf",
+    sourceHash: sourceHash({ emergencyCities, quickCallGuide, stateDepartmentFallback }),
+  };
 }
 
-generateTripGuide();
-generateDezrecs();
-generateEmergency();
+const manifestEntries = [generateDezrecs(), generateEmergency()];
+writeManifest(manifestEntries);
 
-for (const file of ["trip-guide.pdf", "dezrecs.pdf", "emergency.pdf"]) {
+for (const file of ["dezrecs.pdf", "emergency.pdf"]) {
   const target = path.join(downloadsDir, file);
   const size = fs.statSync(target).size;
   if (size <= 0) throw new Error(`${file} was not generated`);

@@ -7,7 +7,9 @@
     "dev": "vite --host 127.0.0.1",
     "generate:maps": "node --experimental-strip-types scripts/generate-maps.mjs",
     "generate:pdfs": "node --experimental-strip-types scripts/generate-pdfs.mjs",
-    "build": "npm run generate:maps && npm run generate:pdfs && tsc -b && vite build",
+    "verify:pdfs": "node --experimental-strip-types scripts/verify-pdfs.mjs",
+    "build:web": "tsc -b && vite build",
+    "build": "npm run generate:maps && npm run generate:pdfs && npm run verify:pdfs && npm run build:web",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {

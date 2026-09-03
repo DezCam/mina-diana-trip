@@ -9,10 +9,10 @@ const recommendationsPath = "/desmonds-amsterdam-recommendations";
 const emergencyPath = "/emergency";
 const downloads = [
   {
-    title: "Trip Guide",
+    title: "Amsterdam Offline Map",
     label: "Download PDF",
-    href: "/downloads/trip-guide.pdf",
-    fileName: "Diana-Mina-European-Adventure-Trip-Guide.pdf",
+    href: "/downloads/amsterdam-map.pdf",
+    fileName: "Diana-Mina-Amsterdam-Offline-Map.pdf",
   },
   {
     title: "Amsterdam Recommendations",
@@ -21,22 +21,16 @@ const downloads = [
     fileName: "Diana-Mina-Amsterdam-Recommendations.pdf",
   },
   {
-    title: "Emergency Contacts",
-    label: "Download PDF",
-    href: "/downloads/emergency.pdf",
-    fileName: "Diana-Mina-Emergency-Contacts.pdf",
-  },
-  {
-    title: "Amsterdam Offline Map",
-    label: "Download PDF",
-    href: "/downloads/amsterdam-map.pdf",
-    fileName: "Diana-Mina-Amsterdam-Offline-Map.pdf",
-  },
-  {
     title: "Edinburgh Offline Map",
     label: "Download PDF",
     href: "/downloads/edinburgh-map.pdf",
     fileName: "Diana-Mina-Edinburgh-Offline-Map.pdf",
+  },
+  {
+    title: "Emergency Contacts",
+    label: "Download PDF",
+    href: "/downloads/emergency.pdf",
+    fileName: "Diana-Mina-Emergency-Contacts.pdf",
   },
 ];
 const amsterdamHeroPhoto = "/images/amsterdam/amsterdam-canal.jpg";
@@ -211,10 +205,6 @@ function Overview() {
           <p className="mt-6 max-w-md text-lg leading-8 text-ink">
             Everything for the adventure in one place — where you're going, what you're doing, and the little details worth remembering.
           </p>
-          <a className="action-button mt-6 min-h-12 px-4" href="/downloads/trip-guide.pdf" download="Diana-Mina-European-Adventure-Trip-Guide.pdf">
-            <Download aria-hidden="true" size={16} />
-            Download Trip Guide PDF
-          </a>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
           <DestinationPanel title="Amsterdam" tone="amsterdam" />

@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 import https from "node:https";
 import path from "node:path";
 import zlib from "node:zlib";
@@ -9,6 +10,7 @@ import { offlineMaps } from "../src/data/mapLocations.ts";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const downloadsDir = path.join(root, "public", "downloads");
+const qaDir = path.join(root, "artifacts", "pdf-qa");
 const tileCacheDir = path.join(root, ".cache", "osm-tiles-v2");
 const siteTitle = "Diana & Mina's European Adventure";
 const userAgent =
@@ -71,6 +73,13 @@ function pdfString(value) {
 function estimateTextWidth(text, size, font = "helvetica") {
   const factor = font.includes("times") ? 0.49 : 0.52;
   return cleanText(text).length * size * factor;
+}
+
+function sourceHash(value) {
+  return crypto
+    .createHash("sha256")
+    .update(JSON.stringify(value))
+    .digest("hex");
 }
 
 function wrapText(text, maxWidth, size, font) {
@@ -483,28 +492,27 @@ function groupedPins(pins) {
 }
 
 function drawLegend(doc, map, yStart, xStart, columnWidth, rowHeight) {
-  let y = yStart;
+  if (map.homeBase) {
+    doc.text(`HOME ${map.homeBase.name} - ${map.homeBase.label}`, xStart, yStart, {
+      size: 10,
+      font: "bold",
+      color: colors.navy,
+      width: doc.width - doc.margin * 2,
+      leading: 12,
+    });
+    doc.linkAnnotation(xStart, yStart - 9, 260, 15, map.homeBase.mapsUrl);
+  }
+
+  const columnStartY = yStart + (map.homeBase ? 32 : 0);
+  let y = columnStartY;
   let x = xStart;
   let row = 0;
   const maxRows = 8;
 
-  if (map.homeBase) {
-    doc.text(`HOME ${map.homeBase.name} - ${map.homeBase.label}`, x, y, {
-      size: 9.5,
-      font: "bold",
-      color: colors.navy,
-      width: columnWidth,
-      leading: 11,
-    });
-    doc.linkAnnotation(x, y - 9, columnWidth, 14, map.homeBase.mapsUrl);
-    y += rowHeight;
-    row += 1;
-  }
-
   for (const [group, pins] of groupedPins(map.pins)) {
     if (row >= maxRows) {
       x += columnWidth + 16;
-      y = yStart;
+      y = columnStartY;
       row = 0;
     }
     doc.text(group.toUpperCase(), x, y, {
@@ -519,7 +527,7 @@ function drawLegend(doc, map, yStart, xStart, columnWidth, rowHeight) {
     for (const pin of pins) {
       if (row >= maxRows) {
         x += columnWidth + 16;
-        y = yStart;
+        y = columnStartY;
         row = 0;
       }
       const label = `${pin.pin}. ${pin.name}`;
@@ -537,6 +545,105 @@ function drawLegend(doc, map, yStart, xStart, columnWidth, rowHeight) {
   }
 }
 
+function markerDistance(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function countMarkerCollisions(markers, minDistance) {
+  let collisions = 0;
+  for (let i = 0; i < markers.length; i += 1) {
+    for (let j = i + 1; j < markers.length; j += 1) {
+      if (markerDistance(markers[i], markers[j]) < minDistance) collisions += 1;
+    }
+  }
+  return collisions;
+}
+
+function markerCandidates(anchor, mapBounds) {
+  const directions = [
+    [0, 0],
+    [0, -1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 1],
+    [-1, 0],
+    [-1, -1],
+  ];
+  const distances = [0, 25, 36, 49, 63, 78, 94];
+  const candidates = [];
+  for (const distance of distances) {
+    for (const [dx, dy] of directions) {
+      if (distance === 0 && (dx !== 0 || dy !== 0)) continue;
+      if (distance > 0 && dx === 0 && dy === 0) continue;
+      const length = Math.hypot(dx, dy) || 1;
+      const x = anchor.x + (dx / length) * distance;
+      const y = anchor.y + (dy / length) * distance;
+      if (
+        x >= mapBounds.x + 13 &&
+        x <= mapBounds.x + mapBounds.w - 13 &&
+        y >= mapBounds.y + 13 &&
+        y <= mapBounds.y + mapBounds.h - 13
+      ) {
+        candidates.push({ x, y });
+      }
+    }
+  }
+  return candidates.sort(
+    (a, b) => markerDistance(a, anchor) - markerDistance(b, anchor) || a.y - b.y || a.x - b.x,
+  );
+}
+
+function layoutMarkers(mapImage, mapX, mapY, mapW, mapH) {
+  const radius = 10;
+  const minDistance = radius * 2 + 5;
+  const mapBounds = { x: mapX, y: mapY, w: mapW, h: mapH };
+  const rawMarkers = mapImage.points.map((point) => ({
+    id: point.id,
+    label: "pin" in point ? String(point.pin) : "H",
+    isHome: !("pin" in point),
+    pin: "pin" in point ? point.pin : "HOME",
+    anchorX: mapX + point.px * (mapW / mapImage.width),
+    anchorY: mapY + point.py * (mapH / mapImage.height),
+    x: mapX + point.px * (mapW / mapImage.width),
+    y: mapY + point.py * (mapH / mapImage.height),
+    radius: point.pin ? radius : 11,
+  }));
+  const initialCollisions = countMarkerCollisions(rawMarkers, minDistance);
+  const placed = [];
+
+  for (const marker of rawMarkers) {
+    const candidates = markerCandidates(
+      { x: marker.anchorX, y: marker.anchorY },
+      mapBounds,
+    );
+    const chosen = candidates.find((candidate) =>
+      placed.every((existing) => markerDistance(candidate, existing) >= minDistance),
+    );
+    if (!chosen) {
+      throw new Error(`Could not place non-overlapping marker ${marker.label}`);
+    }
+    placed.push({
+      ...marker,
+      x: chosen.x,
+      y: chosen.y,
+      displaced: markerDistance(chosen, { x: marker.anchorX, y: marker.anchorY }) > 2,
+    });
+  }
+
+  const remainingCollisions = countMarkerCollisions(placed, minDistance);
+  if (remainingCollisions > 0) {
+    throw new Error(`Marker collision QA failed with ${remainingCollisions} remaining collisions`);
+  }
+
+  return {
+    markers: placed,
+    initialCollisions,
+    remainingCollisions,
+  };
+}
+
 function drawOffMapPage(doc, map) {
   doc.addPage();
   doc.text(siteTitle, doc.margin, 34, {
@@ -545,13 +652,13 @@ function drawOffMapPage(doc, map) {
     color: colors.navy,
     width: 360,
   });
-  doc.text(map.title, doc.margin, 58, {
+  doc.text(map.title, doc.margin, 68, {
     size: 26,
     font: "times-bold",
     color: colors.navy,
     width: 460,
   });
-  doc.line(doc.margin, 87, doc.width - doc.margin, 87);
+  doc.line(doc.margin, 94, doc.width - doc.margin, 94);
   let y = 112;
   const colWidth = 220;
   const rowHeight = 14;
@@ -606,7 +713,7 @@ function drawMapPage(doc, map, mapImage) {
     color: colors.navy,
     width: 360,
   });
-  doc.text(map.title, doc.margin, 55, {
+  doc.text(map.title, doc.margin, 68, {
     size: 31,
     font: "times-bold",
     color: colors.navy,
@@ -618,19 +725,23 @@ function drawMapPage(doc, map, mapImage) {
     color: colors.heather,
     width: 150,
   });
-  doc.line(doc.margin, 84, doc.width - doc.margin, 84);
+  doc.line(doc.margin, 92, doc.width - doc.margin, 92);
 
   doc.setFill(colors.cream);
   doc.rect(mapX - 5, mapY - 5, mapW + 10, mapH + 10, "f");
   doc.imageRgb(mapImage, mapX, mapY, mapW, mapH);
 
-  for (const point of mapImage.points) {
-    const x = mapX + point.px * (mapW / mapImage.width);
-    const y = mapY + point.py * (mapH / mapImage.height);
-    if ("pin" in point) {
-      doc.marker(x, y, String(point.pin), style.pin);
+  const markerLayout = layoutMarkers(mapImage, mapX, mapY, mapW, mapH);
+  for (const marker of markerLayout.markers) {
+    if (marker.displaced) {
+      doc.line(marker.anchorX, marker.anchorY, marker.x, marker.y, colors.navy, 0.45);
+    }
+  }
+  for (const marker of markerLayout.markers) {
+    if (marker.isHome) {
+      doc.marker(marker.x, marker.y, marker.label, style.home, 11);
     } else {
-      doc.marker(x, y, "H", style.home, 11);
+      doc.marker(marker.x, marker.y, marker.label, style.pin);
     }
   }
 
@@ -645,26 +756,54 @@ function drawMapPage(doc, map, mapImage) {
   doc.setStroke(colors.brass);
   doc.rect(mapX - 5, mapY - 5, mapW + 10, mapH + 10, "S");
 
-  drawLegend(doc, map, 474, doc.margin, 210, 13.8);
+  drawLegend(doc, map, 474, doc.margin, 210, 12.6);
 
   if (map.offMapSections.length > 0) {
     drawOffMapPage(doc, map);
   }
+
+  return markerLayout;
 }
 
 async function generateMapPdf(map) {
   const mapImage = await renderMapImage(map, 1440, 700);
   const doc = new PdfDoc(map.title);
-  drawMapPage(doc, map, mapImage);
+  const markerLayout = drawMapPage(doc, map, mapImage);
   const outputPath = path.join(downloadsDir, map.fileName);
   doc.save(outputPath);
-  return outputPath;
+  return { outputPath, markerLayout };
 }
 
 fs.mkdirSync(downloadsDir, { recursive: true });
+fs.mkdirSync(qaDir, { recursive: true });
+const mapManifest = {
+  generatedAt: new Date().toISOString(),
+  maps: [],
+};
 
 for (const map of offlineMaps) {
-  const outputPath = await generateMapPdf(map);
+  const { outputPath, markerLayout } = await generateMapPdf(map);
   const size = fs.statSync(outputPath).size;
+  mapManifest.maps.push({
+    file: map.fileName,
+    sourceHash: sourceHash(map),
+    initialMarkerCollisions: markerLayout.initialCollisions,
+    remainingMarkerCollisions: markerLayout.remainingCollisions,
+    markers: markerLayout.markers.map((marker) => ({
+      id: marker.id,
+      pin: marker.pin,
+      anchorX: Number(marker.anchorX.toFixed(2)),
+      anchorY: Number(marker.anchorY.toFixed(2)),
+      x: Number(marker.x.toFixed(2)),
+      y: Number(marker.y.toFixed(2)),
+      radius: marker.radius,
+      displaced: marker.displaced,
+    })),
+  });
   console.log(`${path.relative(root, outputPath)} ${(size / 1024).toFixed(1)} KB`);
 }
+
+fs.writeFileSync(
+  path.join(qaDir, "map-layout.json"),
+  JSON.stringify(mapManifest, null, 2),
+);
