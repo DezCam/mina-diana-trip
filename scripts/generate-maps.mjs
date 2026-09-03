@@ -520,7 +520,14 @@ function groupedPins(pins) {
   }, new Map());
 }
 
-function drawLegend(doc, map, yStart, xStart, columnWidth, rowHeight) {
+function drawLegend(doc, map, yStart, xStart) {
+  const maxY = doc.height - 12;
+  const gap = 10;
+  const columns = 4;
+  const columnWidth = (doc.width - doc.margin * 2 - gap * (columns - 1)) / columns;
+  let column = 0;
+  let x = xStart;
+
   if (map.homeBase) {
     doc.text(`HOME ${map.homeBase.name} - ${map.homeBase.label}`, xStart, yStart, {
       size: 10,
@@ -533,16 +540,24 @@ function drawLegend(doc, map, yStart, xStart, columnWidth, rowHeight) {
 
   const columnStartY = yStart + (map.homeBase ? 32 : 0);
   let y = columnStartY;
-  let x = xStart;
-  let row = 0;
-  const maxRows = 8;
+
+  function nextColumn() {
+    column += 1;
+    if (column >= columns) {
+      throw new Error(`${map.fileName} legend exceeds allocated bounds`);
+    }
+    x = xStart + column * (columnWidth + gap);
+    y = columnStartY;
+  }
+
+  function ensureLegendHeight(height) {
+    if (y + height > maxY) nextColumn();
+  }
 
   for (const [group, pins] of groupedPins(map.pins)) {
-    if (row >= maxRows) {
-      x += columnWidth + 16;
-      y = columnStartY;
-      row = 0;
-    }
+    const firstPin = pins[0];
+    const firstPinHeight = firstPin ? textHeight(`${firstPin.pin}. ${firstPin.name}`, columnWidth, 8, "helvetica", 9.3) + 3 : 0;
+    ensureLegendHeight(10 + firstPinHeight);
     doc.text(group.toUpperCase(), x, y, {
       size: 7.5,
       font: "bold",
@@ -551,23 +566,18 @@ function drawLegend(doc, map, yStart, xStart, columnWidth, rowHeight) {
       leading: 9,
     });
     y += 10;
-    row += 1;
     for (const pin of pins) {
-      if (row >= maxRows) {
-        x += columnWidth + 16;
-        y = columnStartY;
-        row = 0;
-      }
       const label = `${pin.pin}. ${pin.name}`;
+      const height = textHeight(label, columnWidth, 8, "helvetica", 9.3) + 3;
+      ensureLegendHeight(height);
       doc.text(label, x, y, {
-        size: 9,
+        size: 8,
         font: "helvetica",
         color: colors.ink,
         width: columnWidth,
-        leading: 10.5,
+        leading: 9.3,
       });
-      y += rowHeight;
-      row += 1;
+      y += height;
     }
   }
 }
@@ -854,7 +864,7 @@ function drawMapPage(doc, map, mapImage) {
   doc.setStroke(colors.brass);
   doc.rect(mapX - 5, mapY - 5, mapW + 10, mapH + 10, "S");
 
-  drawLegend(doc, map, 474, doc.margin, 210, 12.6);
+  drawLegend(doc, map, 474, doc.margin);
 
   const directoryEntries = drawAddressDirectoryPages(doc, map);
 
