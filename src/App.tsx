@@ -58,7 +58,6 @@ function TripGuide() {
         <OfflineDownloads />
         <DestinationSection id="amsterdam" title="Amsterdam" tone="amsterdam" showImage />
         <DestinationSection id="scotland" title="Scotland" tone="scotland" showImage />
-        <TripDetails />
       </main>
       <footer className="border-t border-brass/35 px-6 py-8 text-center font-serif text-lg">
         {siteTitle}
@@ -146,7 +145,6 @@ function SiteHeader() {
           <a className="nav-link" href="/#overview">Overview</a>
           <a className="nav-link" href="/#amsterdam">Amsterdam</a>
           <a className="nav-link" href="/#scotland">Scotland</a>
-          <a className="nav-link" href="/#trip-details">Trip Details</a>
           <a className="nav-link" href={emergencyPath}>Emergency</a>
           <a className="recommendations-link col-span-4 justify-center lg:col-span-1 lg:justify-start" href={recommendationsPath}>
             Desmond's Amsterdam Recommendations
@@ -352,22 +350,6 @@ function RecommendationsEntry() {
             Explore Recommendations
             <ArrowRight aria-hidden="true" size={17} />
           </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TripDetails() {
-  return (
-    <section id="trip-details" className="scroll-mt-32 px-6 py-20 sm:px-10 lg:px-20">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex items-center gap-5">
-          <h2 className="font-serif text-5xl text-highland sm:text-6xl">Trip Details</h2>
-          <span className="h-px flex-1 bg-brass/55" aria-hidden="true" />
-        </div>
-        <div className="rounded-lg border border-brass/25 bg-cream p-8 sm:p-10">
-          <p className="font-serif text-3xl text-highland">Coming Soon</p>
         </div>
       </div>
     </section>
