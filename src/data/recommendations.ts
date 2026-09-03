@@ -142,16 +142,20 @@ export const recommendations: Recommendation[] = [
     mapsUrl: "https://maps.app.goo.gl/1DBjhPfdNTB5WUx28",
     images: [
       {
-        src: "/images/recommendations/house-of-rituals/house-of-rituals-food.jpeg",
-        alt: "Food at Rituals Café",
+        src: "/images/recommendations/house-of-rituals/house-of-rituals-coffee.jpeg",
+        alt: "Coffee drinks at House of Rituals",
+      },
+      {
+        src: "/images/recommendations/house-of-rituals/house-of-rituals-pastries.jpeg",
+        alt: "Pastries at House of Rituals",
       },
       {
         src: "/images/recommendations/house-of-rituals/house-of-rituals-dessert.jpeg",
-        alt: "Desserts at Rituals Café",
+        alt: "Dessert at House of Rituals",
       },
       {
-        src: "/images/recommendations/house-of-rituals/house-of-rituals-store.jpeg",
-        alt: "Interior of House of Rituals",
+        src: "/images/recommendations/house-of-rituals/house-of-rituals-soup.jpeg",
+        alt: "Soup at House of Rituals",
       },
     ],
   },
