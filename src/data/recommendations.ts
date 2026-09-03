@@ -178,7 +178,32 @@ export const recommendations: Recommendation[] = [
     personalNote:
       "I remember just being able to grab a seat and scan the QR code at the table for the menu.",
     mapsUrl: "https://maps.app.goo.gl/fZf4nKisMuGax5WG7",
-    images: [],
+    images: [
+      {
+        src: "/images/recommendations/rijksmuseum/rijksmuseum-library.jpeg",
+        alt: "Library inside the Rijksmuseum",
+      },
+      {
+        src: "/images/recommendations/rijksmuseum/rijksmuseum-map.jpeg",
+        alt: "Rijksmuseum map inside the museum",
+      },
+      {
+        src: "/images/recommendations/rijksmuseum/rijksmuseum-gallery.jpeg",
+        alt: "Gallery space inside the Rijksmuseum",
+      },
+      {
+        src: "/images/recommendations/rijksmuseum/rijksmuseum-garden.jpeg",
+        alt: "Rijksmuseum courtyard garden",
+      },
+      {
+        src: "/images/recommendations/rijksmuseum/rijksmuseum-cafe.jpeg",
+        alt: "Cafe inside the Rijksmuseum",
+      },
+      {
+        src: "/images/recommendations/rijksmuseum/rijksmuseum-night-watch.jpeg",
+        alt: "The Night Watch at the Rijksmuseum",
+      },
+    ],
   },
   {
     id: "hans-egstorf",

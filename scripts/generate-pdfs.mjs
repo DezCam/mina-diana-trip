@@ -528,6 +528,7 @@ function generateDezrecs() {
   recommendationGroups.forEach((group) => {
     const groupItems = recommendations.filter((recommendation) => recommendation.group === group.id);
     if (!groupItems.length) return;
+    doc.ensure(68 + Math.min(recommendationIntroHeight(groupItems[0]), 220));
     sectionHeader(doc, group.label);
     groupItems.forEach((recommendation) => {
       doc.ensure(recommendationIntroHeight(recommendation));

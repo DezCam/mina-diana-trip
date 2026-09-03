@@ -66,6 +66,10 @@ export function RecommendationVideo({ video }: { video: RecommendationVideoData 
 
 function RecommendationCard({ recommendation }: { recommendation: Recommendation }) {
   const [featuredImage, ...supportingImages] = recommendation.images ?? [];
+  const supportingGalleryClass =
+    supportingImages.length > 2
+      ? "flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0"
+      : "flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-rows-2 sm:overflow-visible sm:pb-0";
 
   return (
     <article id={recommendation.id} className="scroll-mt-28 overflow-hidden rounded-lg border border-brass/25 bg-cream shadow-soft">
@@ -80,7 +84,7 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
             />
           </div>
           {supportingImages.length > 0 ? (
-            <div className="flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-rows-2 sm:overflow-visible sm:pb-0">
+            <div className={supportingGalleryClass}>
               {supportingImages.map((image) => (
                 <div key={image.src} className="aspect-[4/3] min-w-[78%] snap-start overflow-hidden rounded-md bg-canal/10 sm:min-w-0">
                   <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
