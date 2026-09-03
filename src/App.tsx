@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowRight, Download, MapPin, PhoneCall } from "lucide-react";
+import { useEffect, useState } from "react";
 import { RecommendationVideo, RecommendationsList } from "./components/Recommendations";
 import { getDestinationConsiderations } from "./data/considerations";
 import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "./data/emergency";
@@ -123,8 +124,18 @@ function DownloadPlaceholder({ title }: { title: string }) {
 }
 
 function SiteHeader() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const updateScrolled = () => setIsScrolled(window.scrollY > 16);
+    updateScrolled();
+    window.addEventListener("scroll", updateScrolled, { passive: true });
+
+    return () => window.removeEventListener("scroll", updateScrolled);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-brass/70 bg-cream/94 backdrop-blur-md">
+    <header className={`site-header ${isScrolled ? "site-header-scrolled" : ""}`}>
       <div className="mx-auto flex max-w-[90rem] flex-col gap-4 px-5 py-4 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12">
         <a href="/" className="group flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tulip">
           <img

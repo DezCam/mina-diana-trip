@@ -22,6 +22,28 @@ body {
   color: #fff9ef;
 }
 
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid rgba(198, 161, 91, 0.7);
+  background: rgba(255, 249, 239, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.site-header-scrolled {
+  border-bottom-color: rgba(198, 161, 91, 0.82);
+  background: rgba(255, 249, 239, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 28px rgba(23, 50, 77, 0.08);
+}
+
 .nav-link {
   display: inline-flex;
   min-height: 2.75rem;
