@@ -5,6 +5,7 @@ import path from "node:path";
 import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 import { PNG } from "pngjs";
+import { getOfflineAddress, offlineAddresses } from "../src/data/offlineAddresses.ts";
 import { offlineMaps } from "../src/data/mapLocations.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -97,6 +98,25 @@ function wrapText(text, maxWidth, size, font) {
   }
   if (line) lines.push(line);
   return lines;
+}
+
+function textHeight(text, width, size, font = "helvetica", leading = size * 1.25) {
+  return cleanText(text)
+    .split(/\n/)
+    .reduce((sum, line) => sum + wrapText(line, width, size, font).length * leading, 0);
+}
+
+function addressLinesFor(id) {
+  const address = getOfflineAddress(id);
+  if (!address) {
+    return {
+      id,
+      lines: ["Location not resolved"],
+      status: "UNRESOLVED",
+      sourceUrl: "",
+    };
+  }
+  return address;
 }
 
 function lonToWorldX(lon, zoom) {
@@ -500,7 +520,6 @@ function drawLegend(doc, map, yStart, xStart, columnWidth, rowHeight) {
       width: doc.width - doc.margin * 2,
       leading: 12,
     });
-    doc.linkAnnotation(xStart, yStart - 9, 260, 15, map.homeBase.mapsUrl);
   }
 
   const columnStartY = yStart + (map.homeBase ? 32 : 0);
@@ -538,7 +557,6 @@ function drawLegend(doc, map, yStart, xStart, columnWidth, rowHeight) {
         width: columnWidth,
         leading: 10.5,
       });
-      doc.linkAnnotation(x, y - 8, columnWidth, 13, pin.mapsUrl);
       y += rowHeight;
       row += 1;
     }
@@ -644,7 +662,7 @@ function layoutMarkers(mapImage, mapX, mapY, mapW, mapH) {
   };
 }
 
-function drawOffMapPage(doc, map) {
+function addDirectoryPage(doc, map, subtitle) {
   doc.addPage();
   doc.text(siteTitle, doc.margin, 34, {
     size: 15,
@@ -658,45 +676,116 @@ function drawOffMapPage(doc, map) {
     color: colors.navy,
     width: 460,
   });
+  doc.text(subtitle, doc.width - 310, 72, {
+    size: 13,
+    font: "bold",
+    color: colors.canal,
+    width: 270,
+  });
   doc.line(doc.margin, 94, doc.width - doc.margin, 94);
-  let y = 112;
-  const colWidth = 220;
-  const rowHeight = 14;
-  const columns = [doc.margin, doc.margin + colWidth + 24, doc.margin + (colWidth + 24) * 2];
-  let col = 0;
+  return 118;
+}
+
+function addressEntryHeight(name, address, numberLabel = "") {
+  const width = 520;
+  const title = numberLabel ? `${numberLabel}. ${name}` : name;
+  return (
+    textHeight(title, width, 10, "bold", 12) +
+    address.lines.reduce((sum, line) => sum + textHeight(line, width, 8.5, "helvetica", 10.5), 0) +
+    12
+  );
+}
+
+function drawDirectorySection(doc, map, state, title) {
+  if (state.y > 510) {
+    state.y = addDirectoryPage(doc, map, `${map.id.toUpperCase()} - ADDRESS DIRECTORY`);
+  }
+  doc.text(title.toUpperCase(), doc.margin, state.y, {
+    size: 9,
+    font: "bold",
+    color: colors.canal,
+    width: doc.width - doc.margin * 2,
+    leading: 11,
+  });
+  state.y += 18;
+}
+
+function drawDirectoryEntry(doc, map, state, entry) {
+  const address = addressLinesFor(entry.id);
+  const needed = addressEntryHeight(entry.name, address, entry.pin);
+  if (state.y + needed > 565) {
+    state.y = addDirectoryPage(doc, map, `${map.id.toUpperCase()} - ADDRESS DIRECTORY`);
+  }
+
+  const title = entry.pin ? `${entry.pin}. ${entry.name}` : entry.name;
+  doc.text(title, doc.margin, state.y, {
+    size: 10,
+    font: "bold",
+    color: colors.navy,
+    width: doc.width - doc.margin * 2,
+    leading: 12,
+  });
+  state.y += textHeight(title, doc.width - doc.margin * 2, 10, "bold", 12) + 3;
+
+  for (const line of address.lines) {
+    doc.text(line, doc.margin + 18, state.y, {
+      size: 8.5,
+      font: "helvetica",
+      color: colors.ink,
+      width: doc.width - doc.margin * 2 - 18,
+      leading: 10.5,
+    });
+    state.y += textHeight(line, doc.width - doc.margin * 2 - 18, 8.5, "helvetica", 10.5);
+  }
+  state.y += 10;
+
+  state.entries.push({
+    id: entry.id,
+    pin: entry.pin ?? null,
+    name: entry.name,
+    lines: address.lines,
+    status: address.status,
+    sourceUrl: address.sourceUrl,
+    section: state.currentSection,
+  });
+}
+
+function drawAddressDirectoryPages(doc, map) {
+  const state = {
+    y: addDirectoryPage(doc, map, `${map.id.toUpperCase()} - ADDRESS DIRECTORY`),
+    entries: [],
+    currentSection: "",
+  };
+
+  if (map.homeBase) {
+    state.currentSection = "Home";
+    drawDirectorySection(doc, map, state, "Home");
+    drawDirectoryEntry(doc, map, state, {
+      id: map.homeBase.id,
+      name: `${map.homeBase.name} - ${map.homeBase.label}`,
+    });
+    state.y += 4;
+  }
+
+  for (const [group, pins] of groupedPins(map.pins)) {
+    state.currentSection = group;
+    drawDirectorySection(doc, map, state, group);
+    for (const pin of pins) {
+      drawDirectoryEntry(doc, map, state, pin);
+    }
+    state.y += 4;
+  }
 
   for (const section of map.offMapSections) {
-    if (y > 520) {
-      col += 1;
-      y = 112;
-    }
-    const x = columns[Math.min(col, columns.length - 1)];
-    doc.text(section.title.toUpperCase(), x, y, {
-      size: 9,
-      font: "bold",
-      color: colors.canal,
-      width: colWidth,
-    });
-    y += 18;
-
+    state.currentSection = section.title;
+    drawDirectorySection(doc, map, state, section.title);
     for (const item of section.items) {
-      if (y > 560) {
-        col += 1;
-        y = 112;
-      }
-      const itemX = columns[Math.min(col, columns.length - 1)];
-      const label = item.location ? `${item.name} - ${item.location}` : item.name;
-      doc.text(label, itemX, y, {
-        size: 9,
-        color: colors.ink,
-        width: colWidth,
-        leading: 11,
-      });
-      doc.linkAnnotation(itemX, y - 8, colWidth, 13, item.mapsUrl);
-      y += rowHeight;
+      drawDirectoryEntry(doc, map, state, item);
     }
-    y += 10;
+    state.y += 4;
   }
+
+  return state.entries;
 }
 
 function drawMapPage(doc, map, mapImage) {
@@ -758,20 +847,18 @@ function drawMapPage(doc, map, mapImage) {
 
   drawLegend(doc, map, 474, doc.margin, 210, 12.6);
 
-  if (map.offMapSections.length > 0) {
-    drawOffMapPage(doc, map);
-  }
+  const directoryEntries = drawAddressDirectoryPages(doc, map);
 
-  return markerLayout;
+  return { markerLayout, directoryEntries };
 }
 
 async function generateMapPdf(map) {
   const mapImage = await renderMapImage(map, 1440, 700);
   const doc = new PdfDoc(map.title);
-  const markerLayout = drawMapPage(doc, map, mapImage);
+  const { markerLayout, directoryEntries } = drawMapPage(doc, map, mapImage);
   const outputPath = path.join(downloadsDir, map.fileName);
   doc.save(outputPath);
-  return { outputPath, markerLayout };
+  return { outputPath, markerLayout, directoryEntries };
 }
 
 fs.mkdirSync(downloadsDir, { recursive: true });
@@ -782,11 +869,11 @@ const mapManifest = {
 };
 
 for (const map of offlineMaps) {
-  const { outputPath, markerLayout } = await generateMapPdf(map);
+  const { outputPath, markerLayout, directoryEntries } = await generateMapPdf(map);
   const size = fs.statSync(outputPath).size;
   mapManifest.maps.push({
     file: map.fileName,
-    sourceHash: sourceHash(map),
+    sourceHash: sourceHash({ map, offlineAddresses }),
     initialMarkerCollisions: markerLayout.initialCollisions,
     remainingMarkerCollisions: markerLayout.remainingCollisions,
     markers: markerLayout.markers.map((marker) => ({
@@ -799,6 +886,7 @@ for (const map of offlineMaps) {
       radius: marker.radius,
       displaced: marker.displaced,
     })),
+    directoryEntries,
   });
   console.log(`${path.relative(root, outputPath)} ${(size / 1024).toFixed(1)} KB`);
 }

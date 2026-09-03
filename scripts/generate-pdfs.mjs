@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "../src/data/emergency.ts";
+import { getOfflineAddress, offlineAddresses } from "../src/data/offlineAddresses.ts";
 import { recommendationGroups, recommendations, recommendationsIntroVideo } from "../src/data/recommendations.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -409,6 +410,8 @@ function sectionHeader(doc, label) {
 function recommendationIntroHeight(recommendation) {
   let height = 9 * 1.25 + 7;
   height += wrapText(recommendation.name, 512, 20, "times-bold").length * 24 + 12;
+  const offlineAddress = getOfflineAddress(recommendation.id);
+  if (offlineAddress) height += offlineAddress.lines.length * 12 + 12;
   height += paragraphHeight(recommendation.proximityNote, { size: 10, leading: 13, font: "bold" });
   height += paragraphHeight(recommendation.shortRecommendation, { size: 12, leading: 16 });
   height += paragraphHeight(recommendation.personalNote, { size: 12, leading: 16 });
@@ -422,7 +425,7 @@ function recommendationIntroHeight(recommendation) {
     });
     height += (display?.height ?? 0) + 12;
   }
-  height += recommendation.mapsUrl || recommendation.websiteUrl || recommendation.reservationUrl ? 42 : 0;
+  height += recommendation.websiteUrl || recommendation.reservationUrl ? 42 : 0;
   return Math.min(Math.max(height, 120), 360);
 }
 
@@ -459,6 +462,18 @@ function recommendationHeader(doc, recommendation, groupLabel) {
     gap: Number(gap.toFixed(2)),
   });
   doc.y += titleHeight + 12;
+}
+
+function offlineAddressBlock(doc, recommendation) {
+  const address = getOfflineAddress(recommendation.id);
+  if (!address?.lines?.length) return;
+  doc.paragraph(address.lines.join("\n"), {
+    size: 9.5,
+    leading: 12,
+    color: colors.moss,
+    width: doc.width - doc.margin * 2,
+  });
+  doc.y += 4;
 }
 
 function actionLabelWithoutNumber(action) {
@@ -517,6 +532,7 @@ function generateDezrecs() {
     groupItems.forEach((recommendation) => {
       doc.ensure(recommendationIntroHeight(recommendation));
       recommendationHeader(doc, recommendation, group.label);
+      offlineAddressBlock(doc, recommendation);
       if (recommendation.proximityNote) {
         doc.paragraph(recommendation.proximityNote, { size: 10, font: "bold", color: colors.canal, leading: 13 });
       }
@@ -545,9 +561,6 @@ function generateDezrecs() {
           });
         });
       }
-      if (recommendation.mapsUrl) {
-        doc.button("Open in Maps", recommendation.mapsUrl);
-      }
       if (recommendation.websiteUrl) {
         doc.button("Open Website", recommendation.websiteUrl);
       }
@@ -564,7 +577,7 @@ function generateDezrecs() {
   doc.save(path.join(downloadsDir, "dezrecs.pdf"));
   return {
     file: "dezrecs.pdf",
-    sourceHash: sourceHash({ recommendationGroups, recommendations, recommendationsIntroVideo }),
+    sourceHash: sourceHash({ recommendationGroups, recommendations, recommendationsIntroVideo, offlineAddresses }),
     layout: doc.layoutEvents,
   };
 }

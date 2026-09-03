@@ -10,6 +10,7 @@ export type MapPinLocation = {
 };
 
 export type MapHomeBase = {
+  id: string;
   name: string;
   label: string;
   address: string[];
@@ -48,6 +49,7 @@ export const offlineMaps: OfflineMapData[] = [
     title: "Amsterdam — Offline Map",
     fileName: "amsterdam-map.pdf",
     homeBase: {
+      id: "max-brown-hotel-museum-square",
       name: "Max Brown Hotel Museum Square",
       label: "Home Base",
       address: ["Jan Luijkenstraat 13-15", "1071 CJ Amsterdam"],

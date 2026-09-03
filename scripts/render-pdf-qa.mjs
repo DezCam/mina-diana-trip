@@ -11,7 +11,9 @@ const qaDir = path.join(root, "artifacts", "pdf-qa");
 const standardFontDataUrl = `${path.join(root, "node_modules", "pdfjs-dist", "standard_fonts")}${path.sep}`;
 const dpiScale = 200 / 72;
 const targets = [
+  { file: "amsterdam-map.pdf", folder: "amsterdam-map" },
   { file: "dezrecs.pdf", folder: "dezrecs" },
+  { file: "edinburgh-map.pdf", folder: "edinburgh-map" },
   { file: "emergency.pdf", folder: "emergency" },
 ];
 

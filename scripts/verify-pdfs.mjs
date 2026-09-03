@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "../src/data/emergency.ts";
 import { offlineMaps } from "../src/data/mapLocations.ts";
+import { getOfflineAddress, offlineAddresses } from "../src/data/offlineAddresses.ts";
 import { recommendationGroups, recommendations, recommendationsIntroVideo } from "../src/data/recommendations.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -21,13 +22,13 @@ const requiredPdfs = [
 const expectedHashes = new Map([
   [
     "dezrecs.pdf",
-    hashSource({ recommendationGroups, recommendations, recommendationsIntroVideo }),
+    hashSource({ recommendationGroups, recommendations, recommendationsIntroVideo, offlineAddresses }),
   ],
   [
     "emergency.pdf",
     hashSource({ emergencyCities, quickCallGuide, stateDepartmentFallback }),
   ],
-  ...offlineMaps.map((map) => [map.fileName, hashSource(map)]),
+  ...offlineMaps.map((map) => [map.fileName, hashSource({ map, offlineAddresses })]),
 ]);
 
 function hashSource(value) {
@@ -209,6 +210,101 @@ function validateDezrecsContent(pdfText) {
   }
 }
 
+function validateNoGoogleMapsControls(file, pdfText) {
+  const fullText = [
+    ...pdfText.matchAll(/BT \/(F\d) ([\d.]+) Tf ([\d.-]+) ([\d.-]+) Td \((.*?)\) Tj ET/g),
+  ].map((match) => normalizeText(match[5])).join(" ");
+  const forbidden = ["Open in Maps", "google.com/maps", "maps.app.goo.gl"];
+  const hits = forbidden.filter((text) => fullText.includes(text));
+  if (hits.length) {
+    throw new Error(`${file} still exposes Google Maps controls/URLs: ${hits.join(", ")}`);
+  }
+}
+
+function validateOfflineAddressContent(file, pdfText) {
+  const fullText = normalizeText(
+    [
+      ...pdfText.matchAll(/BT \/(F\d) ([\d.]+) Tf ([\d.-]+) ([\d.-]+) Td \((.*?)\) Tj ET/g),
+    ].map((match) => normalizeText(match[5])).join(" "),
+  );
+
+  if (file === "dezrecs.pdf") {
+    const missing = recommendations
+      .map((recommendation) => ({
+        name: recommendation.name,
+        address: getOfflineAddress(recommendation.id),
+      }))
+      .filter(({ address }) => !address?.lines?.length)
+      .flatMap(({ name }) => [`${name} has no offline address data`]);
+    for (const recommendation of recommendations) {
+      const address = getOfflineAddress(recommendation.id);
+      for (const line of address?.lines ?? []) {
+        if (!fullText.includes(normalizeText(line))) {
+          missing.push(`${recommendation.name} missing offline address line: ${line}`);
+        }
+      }
+    }
+    if (missing.length) throw new Error(`dezrecs.pdf offline address QA failed:\n${missing.join("\n")}`);
+  }
+
+  if (file === "amsterdam-map.pdf" || file === "edinburgh-map.pdf") {
+    const map = offlineMaps.find((entry) => entry.fileName === file);
+    const missing = [];
+    if (!map) throw new Error(`${file} has no source map data`);
+    const entries = [
+      ...(map.homeBase ? [{ id: map.homeBase.id, name: map.homeBase.name }] : []),
+      ...map.pins.map((pin) => ({ id: pin.id, name: pin.name })),
+      ...map.offMapSections.flatMap((section) => section.items.map((item) => ({ id: item.id, name: item.name }))),
+    ];
+    for (const entry of entries) {
+      if (!fullText.includes(normalizeText(entry.name))) missing.push(`${entry.name} missing from ${file}`);
+      const address = getOfflineAddress(entry.id);
+      for (const line of address?.lines ?? []) {
+        if (!fullText.includes(normalizeText(line))) {
+          missing.push(`${entry.name} missing address line from ${file}: ${line}`);
+        }
+      }
+    }
+    if (missing.length) throw new Error(`${file} address directory QA failed:\n${missing.join("\n")}`);
+  }
+}
+
+function validateMapDirectory(mapManifest) {
+  const errors = [];
+  for (const map of offlineMaps) {
+    const manifestMap = mapManifest.maps.find((entry) => entry.file === map.fileName);
+    if (!manifestMap) {
+      errors.push(`${map.fileName} missing map manifest entry`);
+      continue;
+    }
+    const entries = manifestMap.directoryEntries ?? [];
+    const pinEntries = entries.filter((entry) => entry.pin !== null);
+    const expectedPins = map.pins.map((pin) => pin.pin).sort((a, b) => a - b);
+    const actualPins = pinEntries.map((entry) => entry.pin).sort((a, b) => a - b);
+    if (JSON.stringify(actualPins) !== JSON.stringify(expectedPins)) {
+      errors.push(`${map.fileName} directory pins ${actualPins.join(",")} do not match map pins ${expectedPins.join(",")}`);
+    }
+    const duplicates = actualPins.filter((pin, index) => actualPins.indexOf(pin) !== index);
+    if (duplicates.length) {
+      errors.push(`${map.fileName} duplicates directory pin numbers: ${[...new Set(duplicates)].join(", ")}`);
+    }
+    const expectedIds = [
+      ...(map.homeBase ? [map.homeBase.id] : []),
+      ...map.pins.map((pin) => pin.id),
+      ...map.offMapSections.flatMap((section) => section.items.map((item) => item.id)),
+    ];
+    const actualIds = entries.map((entry) => entry.id);
+    for (const id of expectedIds) {
+      if (!actualIds.includes(id)) errors.push(`${map.fileName} directory missing ${id}`);
+      const address = getOfflineAddress(id);
+      if (!address?.lines?.length) errors.push(`${map.fileName} has no offline address for ${id}`);
+    }
+  }
+  if (errors.length) {
+    throw new Error(`map directory QA failed:\n${errors.join("\n")}`);
+  }
+}
+
 function validateManifest() {
   const pdfManifestPath = path.join(qaDir, "manifest.json");
   const mapManifestPath = path.join(qaDir, "map-layout.json");
@@ -249,6 +345,7 @@ function validateManifest() {
       }
     }
   }
+  validateMapDirectory(mapManifest);
 
   return mapManifest;
 }
@@ -286,6 +383,10 @@ for (const file of requiredPdfs) {
   }
   const pdfText = buffer.toString("latin1");
   const textResult = validateText(file, pdfText);
+  if (["dezrecs.pdf", "amsterdam-map.pdf", "edinburgh-map.pdf"].includes(file)) {
+    validateNoGoogleMapsControls(file, pdfText);
+    validateOfflineAddressContent(file, pdfText);
+  }
   if (file === "emergency.pdf") validateEmergencyContent(pdfText);
   if (file === "dezrecs.pdf") validateDezrecsContent(pdfText);
   results.push({ file, size: buffer.length, ...textResult });
