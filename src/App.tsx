@@ -26,6 +26,18 @@ const downloads = [
     href: "/downloads/emergency.pdf",
     fileName: "Diana-Mina-Emergency-Contacts.pdf",
   },
+  {
+    title: "Amsterdam Offline Map",
+    label: "Download PDF",
+    href: "/downloads/amsterdam-map.pdf",
+    fileName: "Diana-Mina-Amsterdam-Offline-Map.pdf",
+  },
+  {
+    title: "Edinburgh Offline Map",
+    label: "Download PDF",
+    href: "/downloads/edinburgh-map.pdf",
+    fileName: "Diana-Mina-Edinburgh-Offline-Map.pdf",
+  },
 ];
 const amsterdamHeroPhoto = "/images/amsterdam/amsterdam-canal.jpg";
 const amsterdamSectionPhoto = "/images/amsterdam/amsterdam-section.jpg";
@@ -87,8 +99,6 @@ function OfflineDownloads() {
             {downloads.map((item) => (
               <DownloadCard key={item.href} item={item} />
             ))}
-            <DownloadPlaceholder title="Amsterdam Map" />
-            <DownloadPlaceholder title="Edinburgh Map" />
           </div>
         </div>
       </div>
@@ -106,19 +116,6 @@ function DownloadCard({ item }: { item: (typeof downloads)[number] }) {
         <Download aria-hidden="true" size={16} />
         {item.label}
       </a>
-    </article>
-  );
-}
-
-function DownloadPlaceholder({ title }: { title: string }) {
-  return (
-    <article className="rounded-md border border-brass/25 bg-parchment/75 p-4">
-      <h3 className="font-serif text-2xl leading-tight text-highland">
-        {title}
-      </h3>
-      <span className="action-button action-button-disabled mt-4 min-h-12 w-full justify-center px-4" aria-disabled="true">
-        Coming Soon
-      </span>
     </article>
   );
 }

@@ -1,0 +1,556 @@
+export type MapPinLocation = {
+  id: string;
+  pin: number;
+  name: string;
+  group: string;
+  lat: number;
+  lon: number;
+  mapsUrl: string;
+  source: string;
+};
+
+export type MapHomeBase = {
+  name: string;
+  label: string;
+  address: string[];
+  lat: number;
+  lon: number;
+  mapsUrl: string;
+  source: string;
+};
+
+export type TextOnlyMapLocation = {
+  id: string;
+  name: string;
+  location: string;
+  reason: string;
+  mapsUrl?: string;
+};
+
+export type OfflineMapData = {
+  id: "amsterdam" | "edinburgh";
+  title: string;
+  fileName: string;
+  homeBase?: MapHomeBase;
+  pins: MapPinLocation[];
+  offMapSections: {
+    title: string;
+    items: TextOnlyMapLocation[];
+  }[];
+};
+
+const mapSearch = (query: string) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+
+export const offlineMaps: OfflineMapData[] = [
+  {
+    id: "amsterdam",
+    title: "Amsterdam — Offline Map",
+    fileName: "amsterdam-map.pdf",
+    homeBase: {
+      name: "Max Brown Hotel Museum Square",
+      label: "Home Base",
+      address: ["Jan Luijkenstraat 13-15", "1071 CJ Amsterdam"],
+      lat: 52.3595541,
+      lon: 4.8809802,
+      mapsUrl: "https://maps.app.goo.gl/GzzUFzn2gMcURruFA",
+      source: "Nominatim address search: Jan Luijkenstraat 13, Amsterdam, Netherlands",
+    },
+    pins: [
+      {
+        id: "eggs-benaddicted-prinsengracht",
+        pin: 1,
+        name: "Eggs Benaddicted Prinsengracht",
+        group: "Food & Drink",
+        lat: 52.364388,
+        lon: 4.8849487,
+        mapsUrl:
+          "https://www.google.com/maps/place/Eggs+Benaddicted+Prinsengracht/@52.364388,4.8843264,19z/data=!4m6!3m5!1s0x47c609c9b0259f8b:0xfa8c0f7d53d9f5b4!8m2!3d52.364388!4d4.8849487!16s%2Fg%2F11mvkb6b16?entry=tts&g_ep=EgoyMDI2MDgyNi4wIPu8ASoASAFQAw%3D%3D&skid=7f00d923-7d40-4c48-bccb-59a060c9ea65",
+        source: "Existing Google Maps URL coordinate in src/data/recommendations.ts",
+      },
+      {
+        id: "blushing",
+        pin: 2,
+        name: "Blushing",
+        group: "Food & Drink",
+        lat: 52.3588108,
+        lon: 4.8803584,
+        mapsUrl:
+          "https://www.google.com/maps/place/Blushing/@52.3588108,4.8777835,17z/data=!3m1!4b1!4m6!3m5!1s0x47c609ef84312b37:0x3b945b98b15e15c7!8m2!3d52.3588108!4d4.8803584!16s%2Fg%2F11bw5x9_yx?entry=tts&g_ep=EgoyMDI2MDgyNi4wIPu8ASoASAFQAw%3D%3D&skid=4c4b1f09-deea-43f0-ac49-22ca0e355279",
+        source: "Existing Google Maps URL coordinate in src/data/recommendations.ts",
+      },
+      {
+        id: "cafe-de-baron",
+        pin: 3,
+        name: "Cafe De Baron",
+        group: "Food & Drink",
+        lat: 52.3569378,
+        lon: 4.8967948,
+        mapsUrl: "https://maps.app.goo.gl/VtotJiniCWz3TW8M9",
+        source: "Nominatim search: Cafe De Baron, Amsterdam, Netherlands",
+      },
+      {
+        id: "coffeeshop-roxy",
+        pin: 4,
+        name: "Coffeeshop Roxy",
+        group: "Food & Drink",
+        lat: 52.356411,
+        lon: 4.8955762,
+        mapsUrl: "https://maps.app.goo.gl/XtEhjwkDedbdj4j89",
+        source: "Nominatim search: Coffeeshop Roxy, Amsterdam, Netherlands",
+      },
+      {
+        id: "weteringsplantsoen",
+        pin: 5,
+        name: "Weteringsplantsoen",
+        group: "Things to Do",
+        lat: 52.3594623,
+        lon: 4.888829,
+        mapsUrl: "https://maps.app.goo.gl/bMNoKkDEnjBvWJQ77",
+        source: "Nominatim search: Weteringplantsoen, Amsterdam, Netherlands",
+      },
+      {
+        id: "bloemenmarkt",
+        pin: 6,
+        name: "Bloemenmarkt",
+        group: "Things to Do",
+        lat: 52.3669308,
+        lon: 4.8907645,
+        mapsUrl: "https://maps.app.goo.gl/KrUW66brx1A87XJ5A",
+        source: "Nominatim search: Bloemenmarkt, Amsterdam, Netherlands",
+      },
+      {
+        id: "rijksmuseum",
+        pin: 7,
+        name: "Rijksmuseum",
+        group: "Things to Do",
+        lat: 52.3598431,
+        lon: 4.8850395,
+        mapsUrl: "https://maps.app.goo.gl/fZf4nKisMuGax5WG7",
+        source: "Nominatim search: Rijksmuseum, Amsterdam, Netherlands",
+      },
+      {
+        id: "hans-egstorf",
+        pin: 8,
+        name: "Hans Egstorf",
+        group: "Treats & Gifts",
+        lat: 52.3701984,
+        lon: 4.8888617,
+        mapsUrl: "https://maps.app.goo.gl/pnacyRkHXySgdA9W9",
+        source: "Nominatim search: Hans Egstorf, Amsterdam, Netherlands",
+      },
+      {
+        id: "jordaan",
+        pin: 9,
+        name: "Jordaan",
+        group: "Could Do's",
+        lat: 52.3754157,
+        lon: 4.8810958,
+        mapsUrl: mapSearch("Jordaan, Amsterdam, Netherlands"),
+        source: "Nominatim search: Jordaan, Amsterdam, Netherlands",
+      },
+      {
+        id: "nine-streets",
+        pin: 10,
+        name: "Nine Streets",
+        group: "Could Do's",
+        lat: 52.3688508,
+        lon: 4.8849938,
+        mapsUrl: mapSearch("Nine Streets, Amsterdam, Netherlands"),
+        source: "Nominatim search: De 9 Straatjes, Amsterdam, Netherlands",
+      },
+      {
+        id: "canal-belt",
+        pin: 11,
+        name: "Canal Belt",
+        group: "Could Do's",
+        lat: 52.371979,
+        lon: 4.8847268,
+        mapsUrl: mapSearch("Canal Belt, Amsterdam, Netherlands"),
+        source: "Nominatim search: Grachtengordel, Amsterdam, Netherlands",
+      },
+      {
+        id: "de-pijp",
+        pin: 12,
+        name: "De Pijp",
+        group: "Could Do's",
+        lat: 52.3533455,
+        lon: 4.8969623,
+        mapsUrl: mapSearch("De Pijp, Amsterdam, Netherlands"),
+        source: "Nominatim search: De Pijp, Amsterdam, Netherlands",
+      },
+      {
+        id: "vondelpark",
+        pin: 13,
+        name: "Vondelpark",
+        group: "Could Do's",
+        lat: 52.3571974,
+        lon: 4.864119,
+        mapsUrl: mapSearch("Vondelpark, Amsterdam, Netherlands"),
+        source: "Nominatim search: Vondelpark, Amsterdam, Netherlands",
+      },
+      {
+        id: "albert-cuyp-market",
+        pin: 14,
+        name: "Albert Cuyp Market",
+        group: "Could Do's",
+        lat: 52.3552329,
+        lon: 4.8917785,
+        mapsUrl: mapSearch("Albert Cuyp Market, Amsterdam, Netherlands"),
+        source: "Nominatim search: Albert Cuyp Market, Amsterdam, Netherlands",
+      },
+      {
+        id: "museumplein",
+        pin: 15,
+        name: "Museumplein",
+        group: "Could Do's",
+        lat: 52.3572706,
+        lon: 4.8815398,
+        mapsUrl: mapSearch("Museumplein, Amsterdam, Netherlands"),
+        source: "Nominatim search: Museumplein, Amsterdam, Netherlands",
+      },
+      {
+        id: "dam-square",
+        pin: 16,
+        name: "Dam Square",
+        group: "Could Do's",
+        lat: 52.3731162,
+        lon: 4.8923511,
+        mapsUrl: mapSearch("Dam Square, Amsterdam, Netherlands"),
+        source: "Nominatim search: Dam Square, Amsterdam, Netherlands",
+      },
+      {
+        id: "begijnhof",
+        pin: 17,
+        name: "Begijnhof",
+        group: "Could Do's",
+        lat: 52.3693959,
+        lon: 4.889956,
+        mapsUrl: mapSearch("Begijnhof, Amsterdam, Netherlands"),
+        source: "Nominatim search: Begijnhof, Amsterdam, Netherlands",
+      },
+      {
+        id: "anne-frank-house",
+        pin: 18,
+        name: "Anne Frank House",
+        group: "Could Do's",
+        lat: 52.3751558,
+        lon: 4.8840807,
+        mapsUrl: mapSearch("Anne Frank House, Amsterdam, Netherlands"),
+        source: "Nominatim search: Anne Frank House, Amsterdam, Netherlands",
+      },
+    ],
+    offMapSections: [
+      {
+        title: "Outside Central Amsterdam",
+        items: [
+          {
+            id: "haarlem",
+            name: "Haarlem",
+            location: "Netherlands",
+            reason: "Day trip location; kept off the central Amsterdam map.",
+            mapsUrl: mapSearch("Haarlem, Netherlands"),
+          },
+          {
+            id: "grote-markt-haarlem",
+            name: "Grote Markt",
+            location: "Haarlem",
+            reason: "Day trip location; kept off the central Amsterdam map.",
+            mapsUrl: mapSearch("Grote Markt, Haarlem, Netherlands"),
+          },
+          {
+            id: "zaanse-schans",
+            name: "Zaanse Schans",
+            location: "Netherlands",
+            reason: "Day trip location; kept off the central Amsterdam map.",
+            mapsUrl: mapSearch("Zaanse Schans, Netherlands"),
+          },
+        ],
+      },
+      {
+        title: "Location Not Mapped Yet",
+        items: [
+          {
+            id: "flagship-amsterdam",
+            name: "Flagship Amsterdam",
+            location: "Amsterdam",
+            reason: "No fixed departure point is identified in the current site data.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "edinburgh",
+    title: "Edinburgh — Offline Map",
+    fileName: "edinburgh-map.pdf",
+    pins: [
+      {
+        id: "palace-of-holyroodhouse",
+        pin: 1,
+        name: "Palace of Holyroodhouse",
+        group: "Edinburgh",
+        lat: 55.9526948,
+        lon: -3.171613,
+        mapsUrl: "https://www.google.com/maps/search/Palace+of+Holyroodhouse,+Edinburgh",
+        source: "Nominatim search: Palace of Holyroodhouse, Edinburgh, Scotland",
+      },
+      {
+        id: "the-real-mary-kings-close",
+        pin: 2,
+        name: "The Real Mary King's Close",
+        group: "Edinburgh",
+        lat: 55.9499608,
+        lon: -3.1904456,
+        mapsUrl: "https://www.google.com/maps/search/The+Real+Mary+King's+Close,+Edinburgh",
+        source: "Nominatim search: The Real Mary King's Close, Edinburgh, Scotland",
+      },
+      {
+        id: "victoria-street",
+        pin: 3,
+        name: "Victoria Street",
+        group: "Edinburgh",
+        lat: 55.9486505,
+        lon: -3.1937686,
+        mapsUrl: "https://www.google.com/maps/search/Victoria+Street,+Edinburgh",
+        source: "Nominatim search: Victoria Street, Edinburgh, Scotland",
+      },
+      {
+        id: "knoops",
+        pin: 4,
+        name: "Knoops",
+        group: "Edinburgh",
+        lat: 55.9522371,
+        lon: -3.203756,
+        mapsUrl: "https://www.google.com/maps/search/Knoops,+Edinburgh",
+        source: "Nominatim search: Knoops, Edinburgh, Scotland",
+      },
+      {
+        id: "st-giles-cathedral",
+        pin: 5,
+        name: "St Giles' Cathedral",
+        group: "Edinburgh",
+        lat: 55.9494789,
+        lon: -3.1908519,
+        mapsUrl: "https://www.google.com/maps/search/St+Giles'+Cathedral,+Edinburgh",
+        source: "Nominatim search: St Giles' Cathedral, Edinburgh, Scotland",
+      },
+      {
+        id: "the-georgian-house",
+        pin: 6,
+        name: "The Georgian House",
+        group: "Edinburgh",
+        lat: 55.9524878,
+        lon: -3.2082145,
+        mapsUrl: "https://www.google.com/maps/search/The+Georgian+House,+Edinburgh",
+        source: "Nominatim search: Georgian House, 7 Charlotte Square, Edinburgh, Scotland",
+      },
+      {
+        id: "edinburgh-castle",
+        pin: 7,
+        name: "Edinburgh Castle",
+        group: "Edinburgh",
+        lat: 55.9486884,
+        lon: -3.2004184,
+        mapsUrl: mapSearch("Edinburgh Castle, Edinburgh, Scotland"),
+        source: "Nominatim search: Edinburgh Castle, Edinburgh, Scotland",
+      },
+      {
+        id: "royal-mile",
+        pin: 8,
+        name: "Royal Mile",
+        group: "Edinburgh",
+        lat: 55.949719,
+        lon: -3.1910551,
+        mapsUrl: mapSearch("Royal Mile, Edinburgh, Scotland"),
+        source: "Nominatim search: Royal Mile, Edinburgh, Scotland",
+      },
+      {
+        id: "grassmarket",
+        pin: 9,
+        name: "Grassmarket",
+        group: "Edinburgh",
+        lat: 55.947481,
+        lon: -3.1962464,
+        mapsUrl: mapSearch("Grassmarket, Edinburgh, Scotland"),
+        source: "Nominatim search: Grassmarket, Edinburgh, Scotland",
+      },
+      {
+        id: "greyfriars",
+        pin: 10,
+        name: "Greyfriars",
+        group: "Edinburgh",
+        lat: 55.9467418,
+        lon: -3.1914228,
+        mapsUrl: mapSearch("Greyfriars, Edinburgh, Scotland"),
+        source: "Nominatim search: Greyfriars, Edinburgh, Scotland",
+      },
+      {
+        id: "scotch-whisky-experience",
+        pin: 11,
+        name: "Scotch Whisky Experience",
+        group: "Edinburgh",
+        lat: 55.9487433,
+        lon: -3.1958749,
+        mapsUrl: mapSearch("Scotch Whisky Experience, Edinburgh, Scotland"),
+        source: "Nominatim search: Scotch Whisky Experience, Edinburgh, Scotland",
+      },
+      {
+        id: "calton-hill",
+        pin: 12,
+        name: "Calton Hill",
+        group: "Edinburgh",
+        lat: 55.9552543,
+        lon: -3.1827977,
+        mapsUrl: mapSearch("Calton Hill, Edinburgh, Scotland"),
+        source: "Nominatim search: Calton Hill, Edinburgh, Scotland",
+      },
+      {
+        id: "arthurs-seat",
+        pin: 13,
+        name: "Arthur's Seat",
+        group: "Edinburgh",
+        lat: 55.9440693,
+        lon: -3.161603,
+        mapsUrl: mapSearch("Arthur's Seat, Edinburgh, Scotland"),
+        source: "Nominatim search: Arthur's Seat, Edinburgh, Scotland",
+      },
+      {
+        id: "stockbridge",
+        pin: 14,
+        name: "Stockbridge",
+        group: "Edinburgh",
+        lat: 55.9579716,
+        lon: -3.2093404,
+        mapsUrl: mapSearch("Stockbridge, Edinburgh, Scotland"),
+        source: "Nominatim search: Stockbridge, Edinburgh, Scotland",
+      },
+      {
+        id: "dean-village",
+        pin: 15,
+        name: "Dean Village",
+        group: "Edinburgh",
+        lat: 55.9522594,
+        lon: -3.2182207,
+        mapsUrl: mapSearch("Dean Village, Edinburgh, Scotland"),
+        source: "Nominatim search: Dean Village, Edinburgh, Scotland",
+      },
+      {
+        id: "old-town",
+        pin: 16,
+        name: "Old Town",
+        group: "Edinburgh",
+        lat: 55.9495699,
+        lon: -3.1914536,
+        mapsUrl: mapSearch("Old Town, Edinburgh, Scotland"),
+        source: "Nominatim search: Old Town, Edinburgh, Scotland",
+      },
+      {
+        id: "new-town",
+        pin: 17,
+        name: "New Town",
+        group: "Edinburgh",
+        lat: 55.9554575,
+        lon: -3.1989995,
+        mapsUrl: mapSearch("New Town, Edinburgh, Scotland"),
+        source: "Nominatim search: New Town, Edinburgh, Scotland",
+      },
+      {
+        id: "princes-street-gardens",
+        pin: 18,
+        name: "Princes Street Gardens",
+        group: "Edinburgh",
+        lat: 55.95025,
+        lon: -3.1994946,
+        mapsUrl: mapSearch("Princes Street Gardens, Edinburgh, Scotland"),
+        source: "Nominatim search: Princes Street Gardens, Edinburgh, Scotland",
+      },
+      {
+        id: "princes-street",
+        pin: 19,
+        name: "Princes Street",
+        group: "Edinburgh",
+        lat: 55.9510261,
+        lon: -3.2026759,
+        mapsUrl: mapSearch("Princes Street, Edinburgh, Scotland"),
+        source: "Nominatim search: Princes Street, Edinburgh, Scotland",
+      },
+      {
+        id: "scottish-parliament",
+        pin: 20,
+        name: "Scottish Parliament",
+        group: "Edinburgh",
+        lat: 55.9524685,
+        lon: -3.1756629,
+        mapsUrl: mapSearch("Scottish Parliament, Edinburgh, Scotland"),
+        source: "Nominatim search: Scottish Parliament, Edinburgh, Scotland",
+      },
+    ],
+    offMapSections: [
+      {
+        title: "Other Scotland Possibilities",
+        items: [
+          "Stirling",
+          "Stirling Castle",
+          "Loch Lomond",
+          "Glencoe Valley",
+          "Three Sisters of Glencoe",
+          "Loch Achtriochtan",
+          "Glencoe Village",
+          "Glenfinnan",
+          "Eilean Donan Castle",
+          "Fort William",
+          "Rannoch Moor",
+          "Isle of Skye",
+          "Portree",
+          "Trotternish Peninsula",
+          "Old Man of Storr",
+          "Kilt Rock",
+          "Mealt Falls",
+          "Quiraing",
+          "Dunvegan",
+          "Dunvegan Castle",
+          "Neist Point",
+          "Talisker Bay",
+          "Fairy Pools",
+          "Glenbrittle",
+          "Cuillin Mountains",
+          "Sligachan",
+        ].map((name) => ({
+          id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+          name,
+          location: "Scotland",
+          reason: "Outside the Edinburgh city map extent.",
+          mapsUrl: mapSearch(`${name}, Scotland`),
+        })),
+      },
+      {
+        title: "Other Countries",
+        items: [
+          {
+            id: "lake-district-national-park",
+            name: "Lake District National Park",
+            location: "England",
+            reason: "England location; not pinned on the Edinburgh city map.",
+            mapsUrl: "https://www.google.com/maps/search/Lake+District+National+Park,+UK",
+          },
+        ],
+      },
+      {
+        title: "Location Not Mapped Yet",
+        items: [
+          {
+            id: "water-of-leith",
+            name: "Water of Leith",
+            location: "Edinburgh",
+            reason: "Broad waterway result; omitted to avoid a misleading single city pin.",
+            mapsUrl: mapSearch("Water of Leith, Edinburgh, Scotland"),
+          },
+        ],
+      },
+    ],
+  },
+];
+
+export const getOfflineMap = (id: OfflineMapData["id"]) =>
+  offlineMaps.find((map) => map.id === id);
