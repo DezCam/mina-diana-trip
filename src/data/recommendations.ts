@@ -33,13 +33,14 @@ export type Recommendation = {
 
 export type RecommendationVideo = NonNullable<Recommendation["video"]>;
 
-export type RecommendationGroupId = "food-drink" | "things-to-do" | "treats-gifts";
+export type RecommendationGroupId = "food-drink" | "coffee" | "things-to-do" | "treats-gifts";
 
 export const recommendationGroups: {
   id: RecommendationGroupId;
   label: string;
 }[] = [
   { id: "food-drink", label: "Food & Drink" },
+  { id: "coffee", label: "Coffee" },
   { id: "things-to-do", label: "Things to Do" },
   { id: "treats-gifts", label: "Treats & Gifts" },
 ];
@@ -132,7 +133,7 @@ export const recommendations: Recommendation[] = [
   {
     id: "house-of-rituals",
     name: "House of Rituals",
-    group: "food-drink",
+    group: "coffee",
     category: "Coffee / Skincare Experience",
     shortRecommendation:
       "The guys and I got amazing coffee here. It's a coffee shop mixed into a skincare/wellness store — all one company, and the whole place is built to create an experience around their products.",
@@ -151,6 +152,61 @@ export const recommendations: Recommendation[] = [
       {
         src: "/images/recommendations/house-of-rituals/house-of-rituals-store.jpeg",
         alt: "Interior of House of Rituals",
+      },
+    ],
+  },
+  {
+    id: "harmani-coffee-brunch",
+    name: "Harmani Coffee & Brunch",
+    group: "coffee",
+    category: "Coffee",
+    mapsUrl: "https://maps.app.goo.gl/UE8wZ6YLdedmn2qN9",
+    images: [
+      {
+        src: "/images/recommendations/harmani-coffee-brunch/harmani-coffee.jpeg",
+        alt: "Coffee and food at Harmani Coffee & Brunch",
+      },
+      {
+        src: "/images/recommendations/harmani-coffee-brunch/harmani-interior.jpeg",
+        alt: "Interior of Harmani Coffee & Brunch",
+      },
+      {
+        src: "/images/recommendations/harmani-coffee-brunch/harmani-food.jpeg",
+        alt: "Food at Harmani Coffee & Brunch",
+      },
+    ],
+  },
+  {
+    id: "cafecito",
+    name: "Cafecito",
+    group: "coffee",
+    category: "Coffee",
+    mapsUrl: "https://maps.app.goo.gl/xsJQLjgYt2jDV8ZL8",
+    images: [
+      {
+        src: "/images/recommendations/cafecito/cafecito-interior.jpeg",
+        alt: "Interior of Cafecito",
+      },
+      {
+        src: "/images/recommendations/cafecito/cafecito-shop.jpeg",
+        alt: "Cafecito shop interior",
+      },
+      {
+        src: "/images/recommendations/cafecito/cafecito-coffee-cups.png",
+        alt: "Coffee cups at Cafecito",
+      },
+    ],
+  },
+  {
+    id: "lot61-amsterdam",
+    name: "LOT61 Amsterdam",
+    group: "coffee",
+    category: "Coffee",
+    mapsUrl: "https://maps.app.goo.gl/sxcdBfpHkHTL7p4U9",
+    images: [
+      {
+        src: "/images/recommendations/lot61-amsterdam/lot61-exterior.jpeg",
+        alt: "Exterior of LOT61 Amsterdam",
       },
     ],
   },

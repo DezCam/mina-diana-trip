@@ -50,6 +50,24 @@ export const offlineAddresses: Record<string, OfflineAddress> = {
     status: "VERIFIED ADDRESS",
     sourceUrl: "https://maps.app.goo.gl/1DBjhPfdNTB5WUx28",
   },
+  "harmani-coffee-brunch": {
+    id: "harmani-coffee-brunch",
+    lines: ["Frans Halsstraat 89H", "1072 BP Amsterdam", "The Netherlands"],
+    status: "VERIFIED ADDRESS",
+    sourceUrl: "https://maps.app.goo.gl/UE8wZ6YLdedmn2qN9",
+  },
+  cafecito: {
+    id: "cafecito",
+    lines: ["Van Baerlestraat 83", "1071 AS Amsterdam"],
+    status: "VERIFIED ADDRESS",
+    sourceUrl: "https://maps.app.goo.gl/xsJQLjgYt2jDV8ZL8",
+  },
+  "lot61-amsterdam": {
+    id: "lot61-amsterdam",
+    lines: ["Kinkerstraat 112", "1053 ED Amsterdam"],
+    status: "VERIFIED ADDRESS",
+    sourceUrl: "https://maps.app.goo.gl/sxcdBfpHkHTL7p4U9",
+  },
   weteringsplantsoen: {
     id: "weteringsplantsoen",
     lines: ["Weteringsplantsoen", "Amsterdam", "Netherlands"],
