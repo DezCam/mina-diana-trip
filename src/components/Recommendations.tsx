@@ -32,6 +32,12 @@ export function RecommendationsList({ recommendations }: RecommendationsListProp
                 <div key={recommendation.id}>
                   <RecommendationCard recommendation={recommendation} />
                   {recommendation.video ? <RecommendationVideo video={recommendation.video} /> : null}
+                  {recommendation.mediaOrder === "video-first" ? (
+                    <div className="mt-5 overflow-hidden rounded-lg border border-brass/25 bg-cream shadow-soft">
+                      <RecommendationImages recommendation={recommendation} />
+                    </div>
+                  ) : null}
+                  {recommendation.mediaOrder === "video-first" ? <RecommendationActions recommendation={recommendation} /> : null}
                 </div>
               ))}
             </div>
@@ -65,35 +71,12 @@ export function RecommendationVideo({ video }: { video: RecommendationVideoData 
 }
 
 function RecommendationCard({ recommendation }: { recommendation: Recommendation }) {
-  const [featuredImage, ...supportingImages] = recommendation.images ?? [];
-  const supportingGalleryClass =
-    supportingImages.length > 2
-      ? "flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0"
-      : "flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-rows-2 sm:overflow-visible sm:pb-0";
+  const shouldShowImagesFirst = recommendation.mediaOrder !== "video-first";
+  const shouldShowActions = recommendation.mediaOrder !== "video-first";
 
   return (
     <article id={recommendation.id} className="scroll-mt-28 overflow-hidden rounded-lg border border-brass/25 bg-cream shadow-soft">
-      {featuredImage ? (
-        <div className={supportingImages.length > 0 ? "grid gap-3 p-3 sm:grid-cols-[1.35fr_0.65fr] sm:p-4" : "p-3 sm:p-4"}>
-          <div className={supportingImages.length > 0 ? "aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[4/3]" : "aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[16/9]"}>
-            <img
-              src={featuredImage.src}
-              alt={featuredImage.alt}
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          {supportingImages.length > 0 ? (
-            <div className={supportingGalleryClass}>
-              {supportingImages.map((image) => (
-                <div key={image.src} className="aspect-[4/3] min-w-[78%] snap-start overflow-hidden rounded-md bg-canal/10 sm:min-w-0">
-                  <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+      {shouldShowImagesFirst ? <RecommendationImages recommendation={recommendation} /> : null}
       <div className="p-5 sm:p-7">
         <h2 className="font-serif text-3xl leading-tight text-highland sm:text-4xl">{recommendation.name}</h2>
         {recommendation.category ? (
@@ -131,35 +114,73 @@ function RecommendationCard({ recommendation }: { recommendation: Recommendation
             <ArrowRight aria-hidden="true" size={15} />
           </a>
         ) : null}
-        <div className="mt-5 flex flex-wrap gap-3">
-          {recommendation.proximityNote ? (
-            <span className="proximity-note">{recommendation.proximityNote}</span>
-          ) : null}
-          {recommendation.mapsUrl ? (
-            <a className="action-button min-h-12 px-4" href={recommendation.mapsUrl} target="_blank" rel="noreferrer">
-              <MapPin aria-hidden="true" size={16} />
-              Open in Maps
-            </a>
-          ) : null}
-          {recommendation.websiteUrl ? (
-            <a className="action-button" href={recommendation.websiteUrl} target="_blank" rel="noreferrer">
-              <ExternalLink aria-hidden="true" size={16} />
-              Website
-            </a>
-          ) : null}
-          {recommendation.reservationUrl === null ? (
-            <span className="action-button action-button-disabled min-h-12 px-4" aria-disabled="true">
-              Reservation Link Coming Soon
-            </span>
-          ) : null}
-          {recommendation.reservationUrl ? (
-            <a className="action-button min-h-12 px-4" href={recommendation.reservationUrl} target="_blank" rel="noreferrer">
-              <ExternalLink aria-hidden="true" size={16} />
-              {recommendation.reservationLabel ?? "Reservation"}
-            </a>
-          ) : null}
-        </div>
+        {shouldShowActions ? <RecommendationActions recommendation={recommendation} /> : null}
       </div>
     </article>
+  );
+}
+
+function RecommendationActions({ recommendation }: { recommendation: Recommendation }) {
+  return (
+    <div className="mt-5 flex flex-wrap gap-3">
+      {recommendation.proximityNote ? (
+        <span className="proximity-note">{recommendation.proximityNote}</span>
+      ) : null}
+      {recommendation.mapsUrl ? (
+        <a className="action-button min-h-12 px-4" href={recommendation.mapsUrl} target="_blank" rel="noreferrer">
+          <MapPin aria-hidden="true" size={16} />
+          Open in Maps
+        </a>
+      ) : null}
+      {recommendation.websiteUrl ? (
+        <a className="action-button" href={recommendation.websiteUrl} target="_blank" rel="noreferrer">
+          <ExternalLink aria-hidden="true" size={16} />
+          Website
+        </a>
+      ) : null}
+      {recommendation.reservationUrl === null ? (
+        <span className="action-button action-button-disabled min-h-12 px-4" aria-disabled="true">
+          Reservation Link Coming Soon
+        </span>
+      ) : null}
+      {recommendation.reservationUrl ? (
+        <a className="action-button min-h-12 px-4" href={recommendation.reservationUrl} target="_blank" rel="noreferrer">
+          <ExternalLink aria-hidden="true" size={16} />
+          {recommendation.reservationLabel ?? "Reservation"}
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
+function RecommendationImages({ recommendation }: { recommendation: Recommendation }) {
+  const [featuredImage, ...supportingImages] = recommendation.images ?? [];
+  const supportingGalleryClass =
+    supportingImages.length > 2
+      ? "flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0"
+      : "flex snap-x gap-3 overflow-x-auto pb-1 sm:grid sm:grid-rows-2 sm:overflow-visible sm:pb-0";
+
+  if (!featuredImage) return null;
+
+  return (
+    <div className={supportingImages.length > 0 ? "grid gap-3 p-3 sm:grid-cols-[1.35fr_0.65fr] sm:p-4" : "p-3 sm:p-4"}>
+      <div className={supportingImages.length > 0 ? "aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[4/3]" : "aspect-[4/3] overflow-hidden rounded-md bg-canal/10 sm:aspect-[16/9]"}>
+        <img
+          src={featuredImage.src}
+          alt={featuredImage.alt}
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
+      </div>
+      {supportingImages.length > 0 ? (
+        <div className={supportingGalleryClass}>
+          {supportingImages.map((image) => (
+            <div key={image.src} className="aspect-[4/3] min-w-[78%] snap-start overflow-hidden rounded-md bg-canal/10 sm:min-w-0">
+              <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }

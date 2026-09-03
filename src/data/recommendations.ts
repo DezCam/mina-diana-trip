@@ -23,6 +23,7 @@ export type Recommendation = {
     url: string;
     embedUrl: string;
   };
+  mediaOrder?: "video-first";
   continueTo?: {
     id: string;
     label: string;
@@ -193,10 +194,11 @@ export const recommendations: Recommendation[] = [
       },
     ],
     video: {
-      title: "De Wallen at Night",
+      title: "The Red Light District",
       url: "https://youtu.be/Cgd6kORO93A",
       embedUrl: "https://www.youtube-nocookie.com/embed/Cgd6kORO93A",
     },
+    mediaOrder: "video-first",
   },
   {
     id: "flagship-amsterdam",
