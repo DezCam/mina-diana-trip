@@ -1,8 +1,8 @@
 import { ArrowLeft, ArrowRight, Download, MapPin, PhoneCall } from "lucide-react";
-import { RecommendationsList } from "./components/Recommendations";
+import { RecommendationVideo, RecommendationsList } from "./components/Recommendations";
 import { getDestinationConsiderations } from "./data/considerations";
 import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "./data/emergency";
-import { recommendations } from "./data/recommendations";
+import { recommendations, recommendationsIntroVideo } from "./data/recommendations";
 
 const recommendationsPath = "/desmonds-amsterdam-recommendations";
 const emergencyPath = "/emergency";
@@ -399,6 +399,9 @@ function RecommendationsPage() {
               Desmond's Amsterdam Recommendations
             </h1>
           </header>
+          <div className="mb-14">
+            <RecommendationVideo video={recommendationsIntroVideo} />
+          </div>
           <RecommendationsList recommendations={recommendations} />
         </div>
       </main>

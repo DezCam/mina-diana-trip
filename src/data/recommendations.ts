@@ -30,6 +30,8 @@ export type Recommendation = {
   websiteUrl?: string;
 };
 
+export type RecommendationVideo = NonNullable<Recommendation["video"]>;
+
 export type RecommendationGroupId = "food-drink" | "things-to-do" | "treats-gifts";
 
 export const recommendationGroups: {
@@ -40,6 +42,12 @@ export const recommendationGroups: {
   { id: "things-to-do", label: "Things to Do" },
   { id: "treats-gifts", label: "Treats & Gifts" },
 ];
+
+export const recommendationsIntroVideo: RecommendationVideo = {
+  title: "Welcome to Amsterdam",
+  url: "https://youtu.be/zx2u8T9yWdI",
+  embedUrl: "https://www.youtube-nocookie.com/embed/zx2u8T9yWdI",
+};
 
 export const recommendations: Recommendation[] = [
   {

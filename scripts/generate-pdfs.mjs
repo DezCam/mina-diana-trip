@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { destinationConsiderations } from "../src/data/considerations.ts";
 import { emergencyCities, quickCallGuide, stateDepartmentFallback } from "../src/data/emergency.ts";
-import { recommendationGroups, recommendations } from "../src/data/recommendations.ts";
+import { recommendationGroups, recommendations, recommendationsIntroVideo } from "../src/data/recommendations.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -374,6 +374,9 @@ function generateTripGuide() {
 
 function generateDezrecs() {
   const doc = createDoc("Desmond's Amsterdam Recommendations");
+  doc.label(recommendationsIntroVideo.title, colors.canal);
+  doc.button(recommendationsIntroVideo.url, recommendationsIntroVideo.url, { width: 235, height: 28 });
+  doc.y += 10;
   recommendationGroups.forEach((group) => {
     const groupItems = recommendations.filter((recommendation) => recommendation.group === group.id);
     if (!groupItems.length) return;

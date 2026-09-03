@@ -1,5 +1,5 @@
 import { ArrowRight, ExternalLink, MapPin } from "lucide-react";
-import { recommendationGroups, type Recommendation } from "../data/recommendations";
+import { recommendationGroups, type Recommendation, type RecommendationVideo as RecommendationVideoData } from "../data/recommendations";
 
 type RecommendationsListProps = {
   recommendations: Recommendation[];
@@ -42,10 +42,12 @@ export function RecommendationsList({ recommendations }: RecommendationsListProp
   );
 }
 
-function RecommendationVideo({ video }: { video: NonNullable<Recommendation["video"]> }) {
+export function RecommendationVideo({ video }: { video: RecommendationVideoData }) {
+  const headingId = `${video.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-video`;
+
   return (
-    <section className="mt-5 rounded-lg border border-brass/25 bg-cream p-3 shadow-soft sm:p-4" aria-labelledby="bloemenmarkt-walk-video">
-      <h3 id="bloemenmarkt-walk-video" className="px-2 pb-3 font-serif text-2xl leading-tight text-highland sm:text-3xl">
+    <section className="mt-5 rounded-lg border border-brass/25 bg-cream p-3 shadow-soft sm:p-4" aria-labelledby={headingId}>
+      <h3 id={headingId} className="px-2 pb-3 font-serif text-2xl leading-tight text-highland sm:text-3xl">
         {video.title}
       </h3>
       <div className="aspect-video overflow-hidden rounded-md bg-canal/10">
