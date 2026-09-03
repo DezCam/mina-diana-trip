@@ -185,9 +185,19 @@ export const recommendations: Recommendation[] = [
     name: "Hans Egstorf",
     group: "treats-gifts",
     category: "Treats & Gifts",
-    shortRecommendation: "Freshly made stroopwafels — a great place for gifts.",
+    shortRecommendation:
+      "Freshly made stroopwafels — a great place for gifts. This is where I bought the stroop waffle gift bags, and they make the stroop waffles right in front of you.",
     personalNote: "A fun place to shop and people-watch.",
     mapsUrl: "https://maps.app.goo.gl/pnacyRkHXySgdA9W9",
-    images: [],
+    images: [
+      {
+        src: "/images/recommendations/hans-egstorf/hans-egstorf-stroopwafels.jpeg",
+        alt: "Fresh stroopwafels at Hans Egstorf",
+      },
+      {
+        src: "/images/recommendations/hans-egstorf/hans-egstorf-shop.jpeg",
+        alt: "Hans Egstorf shop window in Amsterdam",
+      },
+    ],
   },
 ];
