@@ -28,11 +28,20 @@ const expectedHashes = new Map([
     "emergency.pdf",
     hashSource({ emergencyCities, quickCallGuide, stateDepartmentFallback }),
   ],
-  ...offlineMaps.map((map) => [map.fileName, hashSource({ map, offlineAddresses })]),
+  ...offlineMaps.map((map) => [map.fileName, hashSource({ map, offlineAddresses: mapAddressSource(map) })]),
 ]);
 
 function hashSource(value) {
   return crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
+}
+
+function mapAddressSource(map) {
+  const ids = [
+    map.homeBase?.id,
+    ...map.pins.map((pin) => pin.id),
+    ...map.offMapSections.flatMap((section) => section.items.map((item) => item.id)),
+  ].filter(Boolean);
+  return Object.fromEntries(ids.map((id) => [id, offlineAddresses[id]]));
 }
 
 function cleanPdfText(value) {

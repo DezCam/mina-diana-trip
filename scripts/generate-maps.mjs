@@ -83,6 +83,15 @@ function sourceHash(value) {
     .digest("hex");
 }
 
+function mapAddressSource(map) {
+  const ids = [
+    map.homeBase?.id,
+    ...map.pins.map((pin) => pin.id),
+    ...map.offMapSections.flatMap((section) => section.items.map((item) => item.id)),
+  ].filter(Boolean);
+  return Object.fromEntries(ids.map((id) => [id, offlineAddresses[id]]));
+}
+
 function wrapText(text, maxWidth, size, font) {
   const words = cleanText(text).split(/\s+/).filter(Boolean);
   const lines = [];
@@ -873,7 +882,7 @@ for (const map of offlineMaps) {
   const size = fs.statSync(outputPath).size;
   mapManifest.maps.push({
     file: map.fileName,
-    sourceHash: sourceHash({ map, offlineAddresses }),
+    sourceHash: sourceHash({ map, offlineAddresses: mapAddressSource(map) }),
     initialMarkerCollisions: markerLayout.initialCollisions,
     remainingMarkerCollisions: markerLayout.remainingCollisions,
     markers: markerLayout.markers.map((marker) => ({

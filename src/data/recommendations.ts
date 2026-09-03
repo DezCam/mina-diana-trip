@@ -159,6 +159,29 @@ export const recommendations: Recommendation[] = [
     ],
   },
   {
+    id: "red-light-district",
+    name: "Red Light District",
+    group: "things-to-do",
+    category: "De Wallen",
+    shortRecommendation:
+      "De Wallen is the name of Amsterdam's Red Light District.",
+    personalNote:
+      "It's hard to see on Google Maps and difficult to catch the vibe during the day — you could walk through and not notice a thing.",
+    mapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=De%20Wallen%2C%20Amsterdam%2C%20Netherlands",
+    images: [
+      {
+        src: "/images/recommendations/red-light-district/de-wallen-map.jpeg",
+        alt: "Map screenshot showing De Wallen in Amsterdam",
+      },
+    ],
+    video: {
+      title: "De Wallen at Night",
+      url: "https://youtu.be/Cgd6kORO93A",
+      embedUrl: "https://www.youtube-nocookie.com/embed/Cgd6kORO93A",
+    },
+  },
+  {
     id: "flagship-amsterdam",
     name: "Flagship Amsterdam",
     group: "things-to-do",

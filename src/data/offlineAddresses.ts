@@ -56,6 +56,13 @@ export const offlineAddresses: Record<string, OfflineAddress> = {
     status: "VERIFIED LOCATION LABEL",
     sourceUrl: "https://maps.app.goo.gl/KrUW66brx1A87XJ5A",
   },
+  "red-light-district": {
+    id: "red-light-district",
+    lines: ["De Wallen", "Amsterdam, Netherlands"],
+    status: "NO SINGLE STREET ADDRESS",
+    sourceUrl:
+      "https://www.google.com/maps/search/?api=1&query=De%20Wallen%2C%20Amsterdam%2C%20Netherlands",
+  },
   "flagship-amsterdam": {
     id: "flagship-amsterdam",
     lines: ["Departure point: check booking confirmation"],
